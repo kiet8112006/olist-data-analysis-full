@@ -246,22 +246,21 @@ FROM dbo.olist_orders_clean_dataset;
 
 ---
 
-## -- 1. FACT SALES (REVENUE ANALYSIS)
 SELECT
 oi.order_id,
-
-o.customer_id,
 oi.product_id,
 oi.seller_id,
+
+o.customer_id,
 
 CAST(o.order_purchase_timestamp AS DATE) AS order_date,
 
 o.order_status,
 
+1 AS quantity,
+
 oi.price,
 oi.freight_value,
-
-1 AS quantity,
 
 (oi.price + oi.freight_value) AS total_revenue
 
