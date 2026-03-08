@@ -265,9 +265,11 @@ ALTER TABLE dim_date
 ADD CONSTRAINT PK_dim_date
 PRIMARY KEY (date_key);
 
+-- FACT TABLE SALES
 
---fact table sales
 SELECT
+
+ROW_NUMBER() OVER (ORDER BY oi.order_id) AS sales_key,
 
 oi.order_id,
 
@@ -307,7 +309,7 @@ ON CAST(o.order_purchase_timestamp AS DATE) = dd.order_date;
 --primary key
 ALTER TABLE fact_sales
 ADD CONSTRAINT PK_fact_sales
-PRIMARY KEY (order_id, product_key, seller_key);
+PRIMARY KEY (sales_key);
 --foreign key
 ALTER TABLE fact_sales
 ADD CONSTRAINT FK_sales_customers
@@ -334,7 +336,7 @@ SELECT
 
 dc.customer_key,
 
-COUNT(o.order_id) AS total_orders,
+COUNT(DISTINCT o.order_id) AS total_orders,
 
 SUM(p.payment_value) AS total_spent,
 
@@ -351,9 +353,9 @@ MAX(o.order_purchase_timestamp)
 
 INTO fact_customer_orders
 
-FROM dbo.olist_orders_clean_dataset o
+FROM olist_orders_clean_dataset o
 
-LEFT JOIN dbo.olist_order_payments_dataset p
+LEFT JOIN olist_order_payments_dataset p
 ON o.order_id = p.order_id
 
 JOIN dim_customers dc
