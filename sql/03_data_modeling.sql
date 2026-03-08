@@ -389,16 +389,14 @@ ON oi.product_id = dp.product_id
 
 GROUP BY dp.product_key;
 
---fact review
+-- FACT REVIEWS (CUSTOMER SATISFACTION)
+
 SELECT
 
 r.review_id,
-r.order_id,
+r.order_id,          -- degenerate dimension
 
-dp.product_key,
-ds.seller_key,
 dc.customer_key,
-
 dd.date_key,
 
 r.review_score
@@ -410,8 +408,53 @@ FROM dbo.olist_order_reviews_clean_dataset r
 JOIN dbo.olist_orders_clean_dataset o
 ON r.order_id = o.order_id
 
+JOIN dim_customers dc
+ON o.customer_id = dc.customer_id
+
+JOIN dim_date dd
+ON CAST(r.review_creation_date AS DATE) = dd.order_date;
+-- FACT DELIVERY (LOGISTICS PERFORMANCE)
+
+SELECT
+
+o.order_id,                     -- degenerate dimension
+
+dc.customer_key,
+dp.product_key,
+ds.seller_key,
+
+dd.date_key,
+
+-- logistics metrics
+DATEDIFF(day,
+o.order_purchase_timestamp,
+o.order_delivered_customer_date
+) AS delivery_days,
+
+DATEDIFF(day,
+o.order_estimated_delivery_date,
+o.order_delivered_customer_date
+) AS delivery_delay,
+
+DATEDIFF(day,
+o.order_purchase_timestamp,
+o.order_delivered_carrier_date
+) AS processing_days,
+
+DATEDIFF(day,
+o.order_delivered_carrier_date,
+o.order_delivered_customer_date
+) AS shipping_days
+
+INTO fact_delivery
+
+FROM dbo.olist_orders_clean_dataset o
+
 JOIN dbo.olist_order_items_clean_dataset oi
-ON r.order_id = oi.order_id
+ON o.order_id = oi.order_id
+
+JOIN dim_customers dc
+ON o.customer_id = dc.customer_id
 
 JOIN dim_products dp
 ON oi.product_id = dp.product_id
@@ -419,46 +462,8 @@ ON oi.product_id = dp.product_id
 JOIN dim_sellers ds
 ON oi.seller_id = ds.seller_id
 
-JOIN dim_customers dc
-ON o.customer_id = dc.customer_id
-
-JOIN dim_date dd
-ON CAST(r.review_creation_date AS DATE) = dd.order_date;
-
---fact delivered
-SELECT
-
-o.order_id,
-
-dd.date_key,
-
-DATEDIFF(day,
-order_purchase_timestamp,
-order_delivered_customer_date
-) AS delivery_days,
-
-DATEDIFF(day,
-order_estimated_delivery_date,
-order_delivered_customer_date
-) AS delivery_delay,
-
-DATEDIFF(day,
-order_purchase_timestamp,
-order_delivered_carrier_date
-) AS processing_days,
-
-DATEDIFF(day,
-order_delivered_carrier_date,
-order_delivered_customer_date
-) AS shipping_days
-
-INTO fact_delivery
-
-FROM dbo.olist_orders_clean_dataset o
-
 JOIN dim_date dd
 ON CAST(o.order_purchase_timestamp AS DATE) = dd.order_date
 
-WHERE order_delivered_customer_date IS NOT NULL;
-
+WHERE o.order_delivered_customer_date IS NOT NULL;
 
