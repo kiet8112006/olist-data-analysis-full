@@ -303,10 +303,6 @@ SELECT
     STDEV(price) AS std_price
 FROM dbo.olist_order_items_dataset;
 ```
-Result:
-| total_rows | min_price | max_price | avg_price | std_price |
-| ---------- | --------- | --------- | --------- | --------- |
-| 112650     | 0.85      | 6735      | 120.65    | 183.63    |
 #### Freight Cost vs Product Price Check
 Identify order items where the shipping cost (freight_value) exceeds the product price (price).
 sql query:
@@ -327,10 +323,6 @@ SELECT
     STDEV(freight_value) AS std_freight
 FROM dbo.olist_order_items_dataset;
 ```
-Result:
-| total_rows | min_freight | max_freight | avg_freight | std_freight |
-| ---------- | ----------- | ----------- | ----------- | ----------- |
-| 112650     | 0           | 409.68      | 19.99       | 15.81       |
 #### Detect Highest Shipping Costs
 sql query:
 ```sql
@@ -419,7 +411,6 @@ STDEV(payment_value) AS std_payment
 FROM dbo.olist_order_payments_dataset;
 ```
 #### High Payment Value Inspection
-To better understand the distribution of payment values and identify potential extreme transactions, a query was executed to retrieve the top 20 highest payment values in the dataset.
 sql query:
 ```sql
 SELECT TOP 20
@@ -430,7 +421,6 @@ FROM dbo.olist_order_payments_dataset
 ORDER BY payment_value DESC;
 ```
 #### Logical Validation – Installments vs High Payment Value
-This helps determine whether high-value purchases are always associated with installment payments or if customers sometimes prefer to pay the full amount at once.
 sql query:
 ```sql
 SELECT *
