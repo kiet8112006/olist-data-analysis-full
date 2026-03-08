@@ -241,189 +241,6 @@ END AS is_weekend
 INTO dim_date
 
 FROM dbo.olist_orders_clean_dataset;
-
-## -- FACT TABLES
-
----
-
-SELECT
-oi.order_id,
-
-dc.customer_key,
-dp.product_key,
-ds.seller_key,
-dd.date_key,
-
-o.order_status,
-
-1 AS quantity,
-
-oi.price,
-oi.freight_value,
-
-(oi.price + oi.freight_value) AS total_revenue
-
-INTO fact_sales
-
-FROM dbo.olist_order_items_clean_dataset oi
-
-JOIN dbo.olist_orders_clean_dataset o
-ON oi.order_id = o.order_id
-
-JOIN dim_customers dc
-ON o.customer_id = dc.customer_id
-
-JOIN dim_products dp
-ON oi.product_id = dp.product_id
-
-JOIN dim_sellers ds
-ON oi.seller_id = ds.seller_id
-
-JOIN dim_date dd
-ON CAST(o.order_purchase_timestamp AS DATE) = dd.order_date;
----
-
-## -- 2. FACT CUSTOMER ORDERS (CUSTOMER ANALYTICS)
-SELECT
-o.customer_id,
-
-COUNT(o.order_id) AS total_orders,
-
-SUM(p.payment_value) AS total_spent,
-
-AVG(p.payment_value) AS avg_order_value,
-
-MIN(o.order_purchase_timestamp) AS first_order_date,
-
-MAX(o.order_purchase_timestamp) AS last_order_date,
-
-DATEDIFF(day,
-MIN(o.order_purchase_timestamp),
-MAX(o.order_purchase_timestamp)
-) AS customer_lifetime_days
-
-INTO fact_customer_orders
-
-FROM dbo.olist_orders_clean_dataset o
-LEFT JOIN dbo.olist_order_payments_dataset p
-ON o.order_id = p.order_id
-
-GROUP BY o.customer_id;
-
----
-
-## -- 3. FACT PRODUCT SALES (PRODUCT PERFORMANCE)
-SELECT
-oi.product_id,
-
-COUNT(DISTINCT oi.order_id) AS total_orders,
-
-COUNT(*) AS units_sold,
-
-SUM(oi.price) AS product_revenue,
-
-SUM(oi.freight_value) AS total_freight,
-
-SUM(oi.price + oi.freight_value) AS total_revenue,
-
-AVG(oi.price) AS avg_product_price
-
-INTO agg_product_sales
-
-FROM dbo.olist_order_items_clean_dataset oi
-
-GROUP BY oi.product_id;
-
----
-
-## -- 4. FACT REVIEWS (CUSTOMER EXPERIENCE)
-
-SELECT
-r.review_id,
-r.order_id,
-oi.product_id,
-oi.seller_id,
-o.customer_id,
-r.review_score,
-r.review_creation_date
-INTO fact_reviews
-FROM dbo.olist_order_reviews_clean_dataset r
-JOIN dbo.olist_orders_clean_dataset o
-ON r.order_id = o.order_id
-JOIN dbo.olist_order_items_clean_dataset oi
-ON r.order_id = oi.order_id;
-
----
-
-## -- 5. FACT DELIVERY (OPERATIONS ANALYTICS)
-SELECT
-order_id,
-
-CAST(order_purchase_timestamp AS DATE) AS order_date,
-
-DATEDIFF(day,
-order_purchase_timestamp,
-order_delivered_customer_date
-) AS delivery_days,
-
-DATEDIFF(day,
-order_estimated_delivery_date,
-order_delivered_customer_date
-) AS delivery_delay,
-
-DATEDIFF(day,
-order_purchase_timestamp,
-order_delivered_carrier_date
-) AS processing_days,
-
-DATEDIFF(day,
-order_delivered_carrier_date,
-order_delivered_customer_date
-) AS shipping_days
-
-INTO fact_delivery
-
-FROM dbo.olist_orders_clean_dataset
-
-WHERE order_delivered_customer_date IS NOT NULL;
-
----
-
-## -- ADD PRIMARY KEYS
-ALTER TABLE fact_sales
-ADD CONSTRAINT PK_fact_sales
-PRIMARY KEY (order_id, product_key, seller_key);
-
-ALTER TABLE dim_customers
-ADD customer_key INT IDENTITY(1,1);
-
-ALTER TABLE dim_customers
-ADD CONSTRAINT PK_dim_customers
-PRIMARY KEY (customer_key);
-
-ALTER TABLE dim_products
-ADD product_key INT IDENTITY(1,1);
-
-ALTER TABLE dim_products
-ADD CONSTRAINT PK_dim_products
-PRIMARY KEY (product_key);
-
-ALTER TABLE dim_sellers
-ADD seller_key INT IDENTITY(1,1);
-
-ALTER TABLE dim_sellers
-ADD CONSTRAINT PK_dim_sellers
-PRIMARY KEY (seller_key);
-
-ALTER TABLE dim_date
-ADD date_key INT IDENTITY(1,1);
-
-ALTER TABLE dim_date
-ADD CONSTRAINT PK_dim_date
-PRIMARY KEY (date_key);
-
----
-
 -- CUSTOMER
 ALTER TABLE fact_sales
 ADD CONSTRAINT FK_sales_customers
@@ -447,3 +264,198 @@ ALTER TABLE fact_sales
 ADD CONSTRAINT FK_sales_date
 FOREIGN KEY (date_key)
 REFERENCES dim_date(date_key);
+
+ALTER TABLE dim_customers
+ADD CONSTRAINT PK_dim_customers PRIMARY KEY (customer_key);
+
+ALTER TABLE dim_products
+ADD CONSTRAINT PK_dim_products PRIMARY KEY (product_key);
+
+ALTER TABLE dim_sellers
+ADD CONSTRAINT PK_dim_sellers PRIMARY KEY (seller_key);
+
+ALTER TABLE dim_date
+ADD CONSTRAINT PK_dim_date PRIMARY KEY (date_key);
+
+## -- FACT TABLES
+
+---
+
+SELECT
+oi.order_id,
+dc.customer_key,
+dp.product_key,
+ds.seller_key,
+dd.date_key,
+o.order_status,
+1 AS quantity,
+oi.price,
+oi.freight_value,
+(oi.price + oi.freight_value) AS total_revenue
+INTO fact_sales
+FROM olist_order_items_clean_dataset oi
+JOIN olist_orders_clean_dataset o
+ON oi.order_id = o.order_id
+JOIN dim_customers dc
+ON o.customer_id = dc.customer_id
+JOIN dim_products dp
+ON oi.product_id = dp.product_id
+JOIN dim_sellers ds
+ON oi.seller_id = ds.seller_id
+JOIN dim_date dd
+ON CAST(o.order_purchase_timestamp AS DATE) = dd.order_date;
+
+ALTER TABLE fact_sales
+ADD CONSTRAINT PK_fact_sales
+PRIMARY KEY (order_id, product_key, seller_key);
+
+ALTER TABLE fact_sales
+ADD CONSTRAINT FK_sales_customers
+FOREIGN KEY (customer_key)
+REFERENCES dim_customers(customer_key);
+
+ALTER TABLE fact_sales
+ADD CONSTRAINT FK_sales_products
+FOREIGN KEY (product_key)
+REFERENCES dim_products(product_key);
+
+ALTER TABLE fact_sales
+ADD CONSTRAINT FK_sales_sellers
+FOREIGN KEY (seller_key)
+REFERENCES dim_sellers(seller_key);
+
+ALTER TABLE fact_sales
+ADD CONSTRAINT FK_sales_date
+FOREIGN KEY (date_key)
+REFERENCES dim_date(date_key);
+
+## -- 2. FACT CUSTOMER ORDERS (CUSTOMER ANALYTICS)
+SELECT
+dc.customer_key,
+
+COUNT(o.order_id) AS total_orders,
+
+SUM(p.payment_value) AS total_spent,
+
+AVG(p.payment_value) AS avg_order_value,
+
+MIN(o.order_purchase_timestamp) AS first_order_date,
+
+MAX(o.order_purchase_timestamp) AS last_order_date,
+
+DATEDIFF(day,
+MIN(o.order_purchase_timestamp),
+MAX(o.order_purchase_timestamp)
+) AS customer_lifetime_days
+
+INTO fact_customer_orders
+
+FROM dbo.olist_orders_clean_dataset o
+
+LEFT JOIN dbo.olist_order_payments_dataset p
+ON o.order_id = p.order_id
+
+JOIN dim_customers dc
+ON o.customer_id = dc.customer_id
+
+GROUP BY dc.customer_key;
+---
+
+## -- 3. FACT PRODUCT SALES (PRODUCT PERFORMANCE)
+SELECT
+dp.product_key,
+
+COUNT(DISTINCT oi.order_id) AS total_orders,
+
+COUNT(*) AS units_sold,
+
+SUM(oi.price) AS product_revenue,
+
+SUM(oi.freight_value) AS total_freight,
+
+SUM(oi.price + oi.freight_value) AS total_revenue,
+
+AVG(oi.price) AS avg_product_price
+
+INTO agg_product_sales
+
+FROM dbo.olist_order_items_clean_dataset oi
+
+JOIN dim_products dp
+ON oi.product_id = dp.product_id
+
+GROUP BY dp.product_key;
+---
+
+## -- 4. FACT REVIEWS (CUSTOMER EXPERIENCE)
+
+SELECT
+r.review_id,
+r.order_id,
+
+dp.product_key,
+ds.seller_key,
+dc.customer_key,
+
+dd.date_key,
+
+r.review_score
+
+INTO fact_reviews
+
+FROM dbo.olist_order_reviews_clean_dataset r
+
+JOIN dbo.olist_orders_clean_dataset o
+ON r.order_id = o.order_id
+
+JOIN dbo.olist_order_items_clean_dataset oi
+ON r.order_id = oi.order_id
+
+JOIN dim_products dp
+ON oi.product_id = dp.product_id
+
+JOIN dim_sellers ds
+ON oi.seller_id = ds.seller_id
+
+JOIN dim_customers dc
+ON o.customer_id = dc.customer_id
+
+JOIN dim_date dd
+ON CAST(r.review_creation_date AS DATE) = dd.order_date;
+
+---
+
+## -- 5. FACT DELIVERY (OPERATIONS ANALYTICS)
+SELECT
+o.order_id,
+
+dd.date_key,
+
+DATEDIFF(day,
+order_purchase_timestamp,
+order_delivered_customer_date
+) AS delivery_days,
+
+DATEDIFF(day,
+order_estimated_delivery_date,
+order_delivered_customer_date
+) AS delivery_delay,
+
+DATEDIFF(day,
+order_purchase_timestamp,
+order_delivered_carrier_date
+) AS processing_days,
+
+DATEDIFF(day,
+order_delivered_carrier_date,
+order_delivered_customer_date
+) AS shipping_days
+
+INTO fact_delivery
+
+FROM dbo.olist_orders_clean_dataset o
+
+JOIN dim_date dd
+ON CAST(o.order_purchase_timestamp AS DATE) = dd.order_date
+
+WHERE order_delivered_customer_date IS NOT NULL;
