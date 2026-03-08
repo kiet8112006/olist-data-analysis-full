@@ -248,12 +248,11 @@ FROM dbo.olist_orders_clean_dataset;
 
 SELECT
 oi.order_id,
-oi.product_id,
-oi.seller_id,
 
-o.customer_id,
-
-CAST(o.order_purchase_timestamp AS DATE) AS order_date,
+dc.customer_key,
+dp.product_key,
+ds.seller_key,
+dd.date_key,
 
 o.order_status,
 
@@ -267,8 +266,21 @@ oi.freight_value,
 INTO fact_sales
 
 FROM dbo.olist_order_items_clean_dataset oi
+
 JOIN dbo.olist_orders_clean_dataset o
-ON oi.order_id = o.order_id;
+ON oi.order_id = o.order_id
+
+JOIN dim_customers dc
+ON o.customer_id = dc.customer_id
+
+JOIN dim_products dp
+ON oi.product_id = dp.product_id
+
+JOIN dim_sellers ds
+ON oi.seller_id = ds.seller_id
+
+JOIN dim_date dd
+ON CAST(o.order_purchase_timestamp AS DATE) = dd.order_date;
 ---
 
 ## -- 2. FACT CUSTOMER ORDERS (CUSTOMER ANALYTICS)
@@ -378,6 +390,9 @@ WHERE order_delivered_customer_date IS NOT NULL;
 ---
 
 ## -- ADD PRIMARY KEYS
+ALTER TABLE fact_sales
+ADD CONSTRAINT PK_fact_sales
+PRIMARY KEY (order_id, product_key);
 
 ALTER TABLE dim_customers
 ADD customer_key INT IDENTITY(1,1);
