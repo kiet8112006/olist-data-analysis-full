@@ -392,7 +392,7 @@ WHERE order_delivered_customer_date IS NOT NULL;
 ## -- ADD PRIMARY KEYS
 ALTER TABLE fact_sales
 ADD CONSTRAINT PK_fact_sales
-PRIMARY KEY (order_id, product_key);
+PRIMARY KEY (order_id, product_key, seller_key);
 
 ALTER TABLE dim_customers
 ADD customer_key INT IDENTITY(1,1);
