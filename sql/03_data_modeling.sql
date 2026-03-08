@@ -157,26 +157,32 @@ OLIST E-COMMERCE DATASET
 PURPOSE: Create dimension tables and fact tables
 for business analytics
 ========================================================= */
-
----
-
-## -- DIMENSION TABLES
-
--- 1. CUSTOMER DIMENSION
+--customer dimension
 SELECT
+ROW_NUMBER() OVER (ORDER BY customer_id) AS customer_key,
+
 customer_id,
 customer_city,
 customer_state,
 customer_zip_code_prefix,
+
 g.avg_lat,
 g.avg_lng
+
 INTO dim_customers
+
 FROM olist_customers_clean_dataset c
+
 LEFT JOIN geolocation_avg g
 ON c.customer_zip_code_prefix = g.geolocation_zip_code_prefix;
-
--- 2. PRODUCT DIMENSION
+--primary key
+ALTER TABLE dim_customers
+ADD CONSTRAINT PK_dim_customers
+PRIMARY KEY (customer_key);
+--product dimension
 SELECT
+ROW_NUMBER() OVER (ORDER BY p.product_id) AS product_key,
+
 p.product_id,
 
 t.product_category_name_english AS product_category,
@@ -195,12 +201,19 @@ p.product_width_cm
 INTO dim_products
 
 FROM dbo.olist_products_clean_dataset p
+
 LEFT JOIN dbo.product_category_name_translation t
 ON p.product_category_name = t.product_category_name;
-
--- 3. SELLER DIMENSION
+--primary key
+ALTER TABLE dim_products
+ADD CONSTRAINT PK_dim_products
+PRIMARY KEY (product_key);
+--seller dimension
 SELECT
+ROW_NUMBER() OVER (ORDER BY s.seller_id) AS seller_key,
+
 s.seller_id,
+
 s.seller_zip_code_prefix,
 s.seller_city,
 s.seller_state,
@@ -211,11 +224,17 @@ g.avg_lng AS seller_lng
 INTO dim_sellers
 
 FROM dbo.olist_sellers_clean_dataset s
+
 LEFT JOIN dbo.geolocation_avg g
 ON s.seller_zip_code_prefix = g.geolocation_zip_code_prefix;
-
--- 4. DATE DIMENSION
+--primary key
+ALTER TABLE dim_sellers
+ADD CONSTRAINT PK_dim_sellers
+PRIMARY KEY (seller_key);
+--date dimension
 SELECT DISTINCT
+
+ROW_NUMBER() OVER (ORDER BY CAST(order_purchase_timestamp AS DATE)) AS date_key,
 
 CAST(order_purchase_timestamp AS DATE) AS order_date,
 
@@ -233,82 +252,63 @@ DATEPART(week, order_purchase_timestamp) AS week_of_year,
 DATENAME(weekday, order_purchase_timestamp) AS weekday_name,
 
 CASE 
-    WHEN DATENAME(weekday, order_purchase_timestamp) IN ('Saturday','Sunday')
-    THEN 1
-    ELSE 0
+WHEN DATENAME(weekday, order_purchase_timestamp) IN ('Saturday','Sunday')
+THEN 1
+ELSE 0
 END AS is_weekend
 
 INTO dim_date
 
 FROM dbo.olist_orders_clean_dataset;
--- CUSTOMER
-ALTER TABLE fact_sales
-ADD CONSTRAINT FK_sales_customers
-FOREIGN KEY (customer_key)
-REFERENCES dim_customers(customer_key);
-
--- PRODUCT
-ALTER TABLE fact_sales
-ADD CONSTRAINT FK_sales_products
-FOREIGN KEY (product_key)
-REFERENCES dim_products(product_key);
-
--- SELLER
-ALTER TABLE fact_sales
-ADD CONSTRAINT FK_sales_sellers
-FOREIGN KEY (seller_key)
-REFERENCES dim_sellers(seller_key);
-
--- DATE
-ALTER TABLE fact_sales
-ADD CONSTRAINT FK_sales_date
-FOREIGN KEY (date_key)
-REFERENCES dim_date(date_key);
-
-ALTER TABLE dim_customers
-ADD CONSTRAINT PK_dim_customers PRIMARY KEY (customer_key);
-
-ALTER TABLE dim_products
-ADD CONSTRAINT PK_dim_products PRIMARY KEY (product_key);
-
-ALTER TABLE dim_sellers
-ADD CONSTRAINT PK_dim_sellers PRIMARY KEY (seller_key);
-
+--primary key
 ALTER TABLE dim_date
-ADD CONSTRAINT PK_dim_date PRIMARY KEY (date_key);
+ADD CONSTRAINT PK_dim_date
+PRIMARY KEY (date_key);
 
-## -- FACT TABLES
 
----
-
+--fact table sales
 SELECT
+
 oi.order_id,
+
 dc.customer_key,
 dp.product_key,
 ds.seller_key,
 dd.date_key,
+
 o.order_status,
+
 1 AS quantity,
+
 oi.price,
 oi.freight_value,
+
 (oi.price + oi.freight_value) AS total_revenue
+
 INTO fact_sales
+
 FROM olist_order_items_clean_dataset oi
+
 JOIN olist_orders_clean_dataset o
 ON oi.order_id = o.order_id
+
 JOIN dim_customers dc
 ON o.customer_id = dc.customer_id
+
 JOIN dim_products dp
 ON oi.product_id = dp.product_id
+
 JOIN dim_sellers ds
 ON oi.seller_id = ds.seller_id
+
 JOIN dim_date dd
 ON CAST(o.order_purchase_timestamp AS DATE) = dd.order_date;
 
+--primary key
 ALTER TABLE fact_sales
 ADD CONSTRAINT PK_fact_sales
 PRIMARY KEY (order_id, product_key, seller_key);
-
+--foreign key
 ALTER TABLE fact_sales
 ADD CONSTRAINT FK_sales_customers
 FOREIGN KEY (customer_key)
@@ -329,8 +329,9 @@ ADD CONSTRAINT FK_sales_date
 FOREIGN KEY (date_key)
 REFERENCES dim_date(date_key);
 
-## -- 2. FACT CUSTOMER ORDERS (CUSTOMER ANALYTICS)
+--fact customers
 SELECT
+
 dc.customer_key,
 
 COUNT(o.order_id) AS total_orders,
@@ -359,10 +360,10 @@ JOIN dim_customers dc
 ON o.customer_id = dc.customer_id
 
 GROUP BY dc.customer_key;
----
 
-## -- 3. FACT PRODUCT SALES (PRODUCT PERFORMANCE)
+--fact product
 SELECT
+
 dp.product_key,
 
 COUNT(DISTINCT oi.order_id) AS total_orders,
@@ -385,11 +386,10 @@ JOIN dim_products dp
 ON oi.product_id = dp.product_id
 
 GROUP BY dp.product_key;
----
 
-## -- 4. FACT REVIEWS (CUSTOMER EXPERIENCE)
-
+--fact review
 SELECT
+
 r.review_id,
 r.order_id,
 
@@ -423,10 +423,9 @@ ON o.customer_id = dc.customer_id
 JOIN dim_date dd
 ON CAST(r.review_creation_date AS DATE) = dd.order_date;
 
----
-
-## -- 5. FACT DELIVERY (OPERATIONS ANALYTICS)
+--fact delivered
 SELECT
+
 o.order_id,
 
 dd.date_key,
@@ -459,3 +458,5 @@ JOIN dim_date dd
 ON CAST(o.order_purchase_timestamp AS DATE) = dd.order_date
 
 WHERE order_delivered_customer_date IS NOT NULL;
+
+
