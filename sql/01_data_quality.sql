@@ -69,7 +69,8 @@ FROM dbo.olist_customers_dataset;
 | customer_city | 0 |
 | customer_state | 0 |
 Conclusion:  
-No missing values were detected in the customers table.
+No missing values were detected in the customers dataset.
+All customer records contain valid identifiers and location attributes, indicating that the dataset is complete and suitable for geographic and customer analysis.
 ---
 #### Duplicate Check
 To ensure data integrity, the `customer_id` column was checked for duplicate values.
@@ -125,7 +126,7 @@ FROM olist_customers_dataset
 GROUP BY customer_zip_code_prefix
 ORDER BY total_customers DESC;
 ```
-#### distribution check and Data Consistency: customer_city
+#### 1. distribution check and Data Consistency: customer_city
 sql query:
 ```sql
 SELECT 
@@ -135,12 +136,10 @@ FROM olist_customers_dataset
 GROUP BY customer_city
 ORDER BY total_customers DESC;
 ```
-Conclusion:
-This analysis helps identify potential inconsistencies in city names.
-If the same city appears in multiple formats (e.g., "Sao Paulo", "sao paulo", "SAO PAULO"), 
-data standardization may be required during the cleaning stage to ensure consistent grouping 
-and aggregation in future analysis.
-#### distribution check and Data Consistency: customer_state 
+Conclusion
+This analysis helps detect potential inconsistencies in the customer_city column such as variations in capitalization or formatting.
+These inconsistencies may affect grouping and aggregation, therefore city names should be standardized during the data cleaning stage.
+#### 2. distribution check and Data Consistency: customer_state 
 The purpose of this query is to analyze the distribution of customers across Brazilian states and verify the consistency of the customer_state column.
 sql query:
 ```sql
@@ -151,8 +150,6 @@ FROM olist_customers_dataset
 GROUP BY customer_state
 ORDER BY total_customers DESC;
 ```
-Conclusion:
-The distribution analysis confirms how customer records are distributed across different states in the dataset.
 #### Geolocation Validation
 To verify that customer ZIP codes can be linked to geographic coordinates,  
 the `customer_zip_code_prefix` column was compared with the geolocation dataset.
@@ -346,7 +343,8 @@ GROUP BY state;
 Result:
 The query shows that several state appear multiple times with different text formats.  
 Conclusion:  
-state names should be standardized during the data cleaning process to ensure consistent analysis results.
+State values appear consistent across the dataset and follow the standard Brazilian state abbreviations.
+This confirms that the state field can be reliably used for regional analysis.
 ### Geolocation Table Data Quality Summary
 | Check | Result |
 |------|------|
