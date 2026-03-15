@@ -340,7 +340,7 @@ COUNT(DISTINCT o.order_id) AS total_orders,
 
 SUM(p.payment_value) AS total_spent,
 
-AVG(p.payment_value) AS avg_order_value,
+SUM(payment_value) / COUNT(DISTINCT order_id) AS avg_order_value,
 
 MIN(o.order_purchase_timestamp) AS first_order_date,
 
