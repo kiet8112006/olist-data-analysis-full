@@ -76,6 +76,25 @@ from cte_b
 ```
 4. Rating and price
 sql```
-
+with cte_a as (
+  select 
+  pt.product_category_name_english as product_name,
+  oi.price, 
+  r.review_score
+  from dbo.olist_orders_clean_dataset o
+  join dbo.olist_order_items_clean_dataset oi
+  on o.order_id = oi.order_id
+  join dbo.olist_reviews_clean_dataset r
+  on o.order_id = r.order_id 
+  join dbo.olist_products_clean_dataset p
+  on oi.product_id = p.product_id 
+  join dbo.Product_category_name_translation pt
+  on p.product_category_name=pt.product_category_name
+  )
+select product_name, avg(price) as price , avg(review_score) as avg_score from cte_a 
+group by product_name 
+order by price desc 
+```
+  
   
 
