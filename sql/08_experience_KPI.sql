@@ -32,9 +32,50 @@ order by avg_score desc , total_review_good desc
 sql```
 with cte_a as (
   select 
-  year(order_purchase_timestamp) as year, 
-  month(order_purchase_timestamp) as month, 
-  avg(review_score) as avg_score
+  year(o.order_purchase_timestamp) as year, 
+  month(o.order_purchase_timestamp) as month, 
+  avg(r.review_score) as avg_score
   from dbo.olist_orders_clean_dataset o
   join dbo.olist_reviews_clean_dataset r
   on o.order_id = r.order_id 
+  group by year(o.order_purchase_timestamp), month(o.order_purchase_timestamp)
+  )
+, cte_b as (
+  select *, 
+  rank() over( order by avg_score desc ) as rnk 
+  from cte_a )
+select 
+year, month, avg_score from cte_b where rnk = 1
+order by year, month, avg_score desc 
+```
+3. Rating and delivery
+sql```
+with cte_a as (
+  select 
+  year(order_purchase_timestamp) as year, 
+  month(order_purchase_timestamp) as month, 
+  review_score,
+  datediff(day, order_estimated_delivery_date, order_delivered_customer_date) as delay_days
+  from dbo.olist_orders_clean_dataset o
+  join dbo.olist_reviews_clean_dataset r
+  on o.order_id = r.order_id 
+  where order_status = 'delivered'
+   )
+, cte_b as (
+  select 
+  year, 
+  month, avg(review_score) as avg_score,count(*) as total_orders,
+  sum(case when delay_days > 0 then 1 else 0 end ) as delay_counts from cte_a 
+  group by year, month )
+select 
+year, 
+month, 
+avg_score,
+delay_counts * 100.0 / total_orders as delay_rate
+from cte_b 
+```
+4. Rating and price
+sql```
+
+  
+
