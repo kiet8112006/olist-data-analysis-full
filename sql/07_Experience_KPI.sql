@@ -19,11 +19,11 @@ with cte_a as (
   group by product_category_name_english ), 
 cte_b as (
   select *, 
-  rank() over ( order by avg_score, total_review_good desc) as rnk
+  rank() over ( order by avg_score desc , total_review_good desc) as rnk
   from cte_a )
 select product_category_name_english, 
 avg_score,
-total_review_
+total_review_good 
 from cte_b 
 where rnk = 1
 order by avg_score desc , total_review_good desc 
