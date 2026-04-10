@@ -8,26 +8,31 @@ join olist_order_items_clean_dataset oi
 on p.product_id =oi.product_id 
 join Product_category_name_translation pt
 on p.product_category_name = pt.product_category_name 
+join dbo.olist_orders_clean_dataset o
+on oi.order_id = o.order_id
+where o.order_status = 'delivered'
 group by pt.product_category_name_english 
 order by total_revenue desc 
 ```
 2. Top category 
 sql```
-with cte_a as (
+with cte_category_revenue as (
   select 
-  pt.product_category_name_english, 
-  sum(oi.price) as total_revenue, 
-  row_number() over( order by sum(oi.price) desc ) as n
+    pt.product_category_name_english, 
+    sum(oi.price + oi.freight_value) as total_revenue
   from dbo.olist_products_clean_dataset p
   join dbo.olist_order_items_clean_dataset oi 
-  on p.product_id = oi.product_id 
+    on p.product_id = oi.product_id 
   join dbo.olist_orders_clean_dataset o
-  on o.order_id = oi.order_id 
-  join Product_category_name_translation pt
-  on p.product_category_name = pt.product_category_name
+    on o.order_id = oi.order_id 
+  join dbo.product_category_name_translation pt
+    on p.product_category_name = pt.product_category_name
   where o.order_status = 'delivered'
-  group by product_category_name_english )
-select * from cte_a where n = 1;
+  group by pt.product_category_name_english
+)
+select top 1 *
+from cte_category_revenue
+order by total_revenue desc;
 ```
 3. Top category by % total revenue 
 sql```
