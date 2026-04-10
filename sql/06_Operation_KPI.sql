@@ -56,7 +56,7 @@ where order_status = 'delivered'
   )
 select 
 year, month, 
-avg(delay_days) as delay_days_avg from cte_a group by year(order_purchase_timestamp), month(order_purchase_timestamp) 
+avg(delay_days) as delay_days_avg from cte_a group by year, month 
 order by year, month 
 ```
 4. delay time by prev year, month
