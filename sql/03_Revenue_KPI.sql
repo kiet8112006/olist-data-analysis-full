@@ -119,7 +119,7 @@ on o.customer_id=c.customer_id
 where o.order_status = 'delivered'
 group by customer_unique_id)
 
-select * from revenue_per_customer order by tptal_revenue desc 
+select * from revenue_per_customer order by tal_revenue desc 
 ```
 10. Revenue by seller 
 sql ```
@@ -130,6 +130,8 @@ sum(oi.price + oi.freight_value) as total_revenue
 from dbo.olist_order_items_clean_dataset oi
 join dbo.olist_orders_clean_dataset o
 on oi.order_id=o.order_id
+join dbo.olist_sellers_clean_dataset s
+on oi.seller_id = s.seller_id
 where o.order_status = 'delivered'
 group by s.seller_id )
 
