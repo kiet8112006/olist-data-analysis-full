@@ -11,7 +11,7 @@ Order_reviews_clean['has comment']=Order_reviews_clean['review_comment_message']
 Order_reviews_clean['has title']=Order_reviews_clean['review_comment_title'].notnull().astype(int)
 # Check duplicated for all column 
 for i in cols:
-  print(f"{i} : {Order_reviews_clean[i].duplcated().sum()}")
+  print(f"{i} : {Order_reviews_clean[i].duplicated().sum()}")
 Order_reviews_clean= Order_reviews_clean.sort_values(by='review_creation_date')
 Order_reviews_clean=Order_reviews_clean.drop_duplicates(subset=['review_id'], keep='last')
 print(Order_reviews_clean.groupby('order_id')['review_id'].nunique().value_counts())
@@ -29,6 +29,6 @@ for i in a:
 Order_reviews_clean['response_time']=( Order_reviews_clean['review_answer_timestamp'] - Order_reviews_clean['review_creation_date']).dt.days 
 print(Order_reviews_clean['response_time'].describe())
 # Save cleaned file
-Order_reviews_clean=pd.to_csv('Order_reviews_clean.csv')
+Order_reviews_clean.to_csv('Order_reviews_clean.csv')
 
 
