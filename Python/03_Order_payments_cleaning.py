@@ -21,5 +21,5 @@ print(Order_payments_clean['payment_value'].describe())
 print((Order_payments_clean['payment_value'] ==0).sum())
 Order_payments_clean['flag_payment_value']=(Order_payments_clean['payment_value'] ==0).astype(int)
 # save cleaned file
-Order_payments_clean=to_csv('Order_payments_clean.csv', index= false)
+Order_payments_clean.to_csv('Order_payments_clean.csv', index= False)
 
