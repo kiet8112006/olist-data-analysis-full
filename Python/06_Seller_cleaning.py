@@ -10,17 +10,17 @@ for i in cols:
 # Check duplicates
 print(Sellers_clean['seller_id'].duplicated().sum())
 # Standardize seller_state
-sellers_clean['seller_state']=Sellers_clean['seller_state'].str.strip().str.upper()
+Sellers_clean['seller_state']=Sellers_clean['seller_state'].str.strip().str.upper()
 
-print(Sellers_clean['Seller_state'].value_counts(normalize=True))
-print(sorted(Sellers_clean['Seller_state'].unique()))
-for letter in sorted(Sellers_clean['Seller_state'].str[0].unique()):
+print(Sellers_clean['seller_state'].value_counts(normalize=True))
+print(sorted(Sellers_clean['seller_state'].unique()))
+for letter in sorted(Sellers_clean['seller_state'].str[0].unique()):
     print(f"\n--- {letter} ---")
     print(sorted(Sellers_clean[
         Sellers_clean['seller_state'].str.startswith(letter)
     ]['seller_state'].unique()))
 # standardize seller_city
-Sellers_clean['seller_city']=Customers_clean['seller_city'].str.strip().str.upper()
+Sellers_clean['seller_city']=Sellers_clean['seller_city'].str.strip().str.upper()
 print(Sellers_clean['seller_city'].value_counts(normalize=True))
 Sellers_clean['seller_zip_code_prefix'].info()
 Sellers_clean['seller_zip_code_prefix'] = (
@@ -30,7 +30,7 @@ Sellers_clean['seller_zip_code_prefix'] = (
 )
 print(Sellers_clean['seller_zip_code_prefix'].nunique())
 # Save cleaned file
-Sellers_clean=pd.to_csv('Sellers_clean_csv')
+Sellers_clean.to_csv('Sellers_clean_csv')
 
 
 
