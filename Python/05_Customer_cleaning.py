@@ -39,4 +39,4 @@ Customers_clean['customer_zip_code_prefix'] = (
     .astype(str)
     .str.zfill(5))
 # Save cleaned file
-Customers_clean=pd.to_csv('Customers_clean.csv')
+Customers_clean.to_csv('Customers_clean.csv')
