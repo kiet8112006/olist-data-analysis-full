@@ -21,5 +21,5 @@ print(Order_items_clean['freight_value'].describe())
 # Check the correlation between price and freight_value
 print(Order_items_clean[['price', 'freight_value']].corr()
 # Save cleaned file
-Order_items_clean.to_csv(
+Order_items_clean.to_csv('Order_items_clean.csv', index= False)
 
