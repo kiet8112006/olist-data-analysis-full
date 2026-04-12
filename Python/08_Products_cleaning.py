@@ -1,7 +1,8 @@
+import pandas as pd
 Products=pd.read_csv('olist_products_dataset.csv')
 # Check the size of Products dataset 
 Products_clean=Products.copy()
-Print(Products_clean.shape)
+print(Products_clean.shape)
 Products_clean.info()
 # Check null for all columns 
 cols = [ 'product_id', 'product_category_name', 'product_name_lenght', 'product_description_lenght', 'product_photos_qty', 'product_weight_g', 'product_length_cm', 
@@ -39,10 +40,10 @@ for col in num_cols:
     Products_clean.loc[Products_clean[col] <= 0, col] = None
     Products_clean[col] = Products_clean[col].fillna(Products_clean[col].median())
 Products_clean['long_desc_flag'] = (
-    Products_clean['product_description_length'] > 2000
+    Products_clean['product_description_lenght'] > 2000
 ).astype(int)
 # Save cleaned file
-Products_clean=pd.to_csv('Products_clean.csv')
+Products_clean.to_csv('Products_clean.csv')
 
 
 
