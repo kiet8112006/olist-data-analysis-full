@@ -30,7 +30,7 @@ Sellers_clean['seller_zip_code_prefix'] = (
 )
 print(Sellers_clean['seller_zip_code_prefix'].nunique())
 # Save cleaned file
-Sellers_clean.to_csv('Sellers_clean_csv')
+Sellers_clean.to_csv('Sellers_clean.csv')
 
 
 
