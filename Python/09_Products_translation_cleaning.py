@@ -10,4 +10,4 @@ print(Product_translation_clean['product_category_name_english'].duplicated().su
 Product_translation_clean['product_category_name'] =Product_translation_clean['product_category_name'].str.strip()
 Product_translation_clean['product_category_name_english'] =Product_translation_clean['product_category_name_english'].str.strip()
 # Save cleaned file
-Product_translation_clean=pd.to_csv('Product_translation_clean.csv')
+Product_translation_clean.to_csv('Product_translation_clean.csv')
