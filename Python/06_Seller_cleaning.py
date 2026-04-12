@@ -20,6 +20,18 @@ for letter in sorted(Sellers_clean['Seller_state'].str[0].unique()):
         Sellers_clean['seller_state'].str.startswith(letter)
     ]['seller_state'].unique()))
 # standardize seller_city
+Sellers_clean['seller_city']=Customers_clean['seller_city'].str.strip().str.upper()
+print(Sellers_clean['seller_city'].value_counts(normalize=True))
+Sellers_clean['seller_zip_code_prefix'].info()
+Sellers_clean['seller_zip_code_prefix'] = (
+    Sellers_clean['seller_zip_code_prefix']
+    .astype(str)
+    .str.zfill(5)
+)
+print(Sellers_clean['seller_zip_code_prefix'].nunique())
+# Save cleaned file
+Sellers_clean=pd.to_csv('Sellers_clean_csv')
+
 
 
 
