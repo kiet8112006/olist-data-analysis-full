@@ -7,9 +7,9 @@ Order_items_clean.info()
 # Check null for all columns
 print(Order_items_clean.isnull().sum())
 # Check duplicate for (order_id, order_item_id), product_id, seller_id 
-print(Order_items_clean.duplicated(subset=['order_id', 'order_item_id']).sum())
-print(Order_items_clean['product_id'].duplicated().sum())
-print(Order_items_clean['seller_id'].duplicated().sum())
+print((Order_items_clean.duplicated(subset=['order_id', 'order_item_id']).sum())
+print((Order_items_clean['product_id'].duplicated().sum())
+print((Order_items_clean['seller_id'].duplicated().sum())
 #  Check price <=0
 print(Order_items_clean['price'] <= 0).sum())
 print(Order_items_clean['price'].describe())
@@ -17,7 +17,7 @@ print(Order_items_clean['price'].describe())
 print((Order_items_clean['freight_value'] <= 0).sum())
 print((Order_items_clean['freight_value'] ==0).sum())
 Order_items_clean['flag_free_shipping']=(Order_items_clean['freight_value']==0).astype(int)
-print(Order_items_clean['freight_value'].describe())
+print((Order_items_clean['freight_value'].describe())
 # Check the correlation between price and freight_value
 print(Order_items_clean[['price', 'freight_value']].corr())
 # Convert shipping_limit_date into datetime column
