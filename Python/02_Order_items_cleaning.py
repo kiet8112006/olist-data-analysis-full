@@ -20,6 +20,10 @@ Order_items_clean['flag_free_shipping']=(Order_items_clean['freight_value']==0).
 print(Order_items_clean['freight_value'].describe())
 # Check the correlation between price and freight_value
 print(Order_items_clean[['price', 'freight_value']].corr())
+# Convert shipping_limit_date into datetime column
+Order_items_clean['shipping_limit_date']=pd.to_datetime(Order_items_clean['shipping_limit_date'], errors='coerce')
+# Check range of shipping_limit_date
+print('Max shipping_limit_date :', Order_items_clean['shipping_limit_date'].max(), 'and Min shipping_limit_date :', Order_items_clean['shipping_limit_date'].min())
 # Save cleaned file
 Order_items_clean.to_csv('Order_items_clean.csv', index= False)
 
