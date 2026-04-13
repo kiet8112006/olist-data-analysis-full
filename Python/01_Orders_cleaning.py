@@ -1,5 +1,5 @@
 import pandas as pd 
-Orders=pd.read_csv('olist_orders_dataset.')
+Orders=pd.read_csv('olist_orders_dataset.csv')
 # Check the size of the Orders dataset
 Orders_clean=Orders.copy()
 print('Orders_clean.shape')
