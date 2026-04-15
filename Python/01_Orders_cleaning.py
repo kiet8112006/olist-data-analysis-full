@@ -21,6 +21,26 @@ Orders_clean.loc[Orders_clean['order_approved_at'] < Orders_clean['order_purchas
 #5. Missing  date but order_status='delivered'
 print(((Orders_clean['order_status']=='delivered') & 
        (Orders_clean['order_delivered_customer_date'].isna())).sum())
+#6. Check logic order_purchase_timestamp and shipping_limit_date
+df = order_items_clean.merge(
+    orders_clean[['order_id', 'order_purchase_timestamp']],
+    on='order_id',
+    how='left'
+)
+df['is_valid_shipping'] = df['shipping_limit_date'] >= df['order_purchase_timestamp']
+df['shipping_delay_days'] = (
+    df['shipping_limit_date'] - df['order_purchase_timestamp']
+).dt.days
+
+df = df.merge(
+    orders[['order_id', 'order_delivered_carrier_date']],
+    on='order_id',
+    how='left'
+)
+
+df['on_time_shipping'] = (
+    df['order_delivered_carrier_date'] <= df['shipping_limit_date']
+)
 # check null for all columns
 print(Orders_clean.isnull().sum())
 Orders_clean['flag_approved']=Orders_clean['order_approved_at'].isnull().astype(int)
@@ -34,5 +54,6 @@ print(Orders_clean['order_status'].value_counts(normalize=True))
 # check range of datetime columns 
 for i in date_cols:
   print(f'{i} Min date: {Orders_clean[i].min()} and Max date: {Orders_clean[i].max()}')
+
 # Save  cleaned file
 Orders_clean.to_csv('Orders_clean.csv', index=False)
