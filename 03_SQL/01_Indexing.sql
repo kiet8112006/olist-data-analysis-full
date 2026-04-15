@@ -191,25 +191,33 @@ FROM Customers_clean;
 CREATE TABLE dim_product (
     product_key INT IDENTITY(1,1) PRIMARY KEY,
     product_id VARCHAR(50),
-    product_category_name VARCHAR(100)
-);
 
+    product_category_name VARCHAR(100),
+    product_category_name_english VARCHAR(100)
+);
 INSERT INTO dim_product
 SELECT DISTINCT
-    product_id,
-    product_category_name
-FROM Products_clean;
+    p.product_id,
+    p.product_category_name,
+
+    ISNULL(t.product_category_name_english, 'Unknown')
+
+FROM Products_clean p
+LEFT JOIN Product_translation_clean t
+    ON p.product_category_name = t.product_category_name;
 ----------------------------------------------------------------------------------
 CREATE TABLE dim_seller (
     seller_key INT IDENTITY(1,1) PRIMARY KEY,
     seller_id VARCHAR(50),
-    seller_city VARCHAR(100)
-);
 
+    seller_city VARCHAR(100),
+    seller_state VARCHAR(50)
+);
 INSERT INTO dim_seller
 SELECT DISTINCT
     seller_id,
-    seller_city
+    seller_city,
+    seller_state
 FROM Sellers_clean;
 -----------------------------------------------------------------------------------
 ---Indexing 
