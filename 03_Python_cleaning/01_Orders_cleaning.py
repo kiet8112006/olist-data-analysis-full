@@ -57,13 +57,6 @@ missing_delivered = (
     (orders_clean['order_status'] == 'delivered') &
     (orders_clean['order_delivered_customer_date'].isna())
 )
-#4. shipping logic
-# Merge order_items + orders
-df = order_items_clean.merge(
-    orders_clean[['order_id', 'order_purchase_timestamp', 'order_delivered_carrier_date']],
-    on='order_id',
-    how='left'
-)
 #5. Null flag 
 print("Missing delivered date:", missing_delivered.sum())
 orders_clean['flag_approved_null'] = orders_clean['order_approved_at'].isna().astype(int)
