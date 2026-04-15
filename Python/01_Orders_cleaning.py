@@ -1,59 +1,100 @@
-import pandas as pd 
-Orders=pd.read_csv('olist_orders_dataset.csv')
-# Check the size of the Orders dataset
-Orders_clean=Orders.copy()
-print(Orders_clean.shape)
-Orders_clean.info()
-# Convert date columns into datetime format
-date_cols=['order_purchase_timestamp', 'order_approved_at', 'order_delivered_carrier_date', 'order_delivered_customer_date', 'order_estimated_delivery_date']
-for i in date_cols:
-  Orders_clean[i] = pd.to_datetime(Orders_clean[i], errors='coerce')
-# Check logic date columns
-#1. Purchase < Delivered
-Orders_clean['is_invalid_date']=0
-Orders_clean.loc[Orders_clean['order_purchase_timestamp'] > Orders_clean['order_delivered_customer_date'], 'is_invalid_date']=1
-#2. Approved < Shipping
-Orders_clean.loc[Orders_clean['order_approved_at'] > Orders_clean['order_delivered_carrier_date'], 'is_invalid_date']=1
-#3. Shipping < delivered
-Orders_clean.loc[Orders_clean['order_delivered_carrier_date'] > Orders_clean['order_delivered_customer_date'], 'is_invalid_date']=1
-#4. approved < purchase
-Orders_clean.loc[Orders_clean['order_approved_at'] < Orders_clean['order_purchase_timestamp'], 'is_invalid_date'] = 1
-#5. Missing  date but order_status='delivered'
-print(((Orders_clean['order_status']=='delivered') & 
-       (Orders_clean['order_delivered_customer_date'].isna())).sum())
-#6. Check logic order_purchase_timestamp and shipping_limit_date
+import pandas as pd
+#1. Load to data
+orders = pd.read_csv('olist_orders_dataset.csv')
+order_items = pd.read_csv('olist_order_items_dataset.csv')
+
+orders_clean = orders.copy()
+order_items_clean = order_items.copy()
+
+print("Shape:", orders_clean.shape)
+orders_clean.info()
+#2. Connvert to datetime
+date_cols = [
+    'order_purchase_timestamp',
+    'order_approved_at',
+    'order_delivered_carrier_date',
+    'order_delivered_customer_date',
+    'order_estimated_delivery_date'
+]
+#3. Validate logic 
+for col in date_cols:
+    orders_clean[col] = pd.to_datetime(orders_clean[col], errors='coerce')
+orders_clean['is_invalid_date'] = 0
+
+# Helper function 
+def invalid_condition(cond):
+    return cond.fillna(False)
+
+# Purchase <= Delivered
+orders_clean.loc[
+    invalid_condition(
+        orders_clean['order_purchase_timestamp'] > orders_clean['order_delivered_customer_date']
+    ),
+    'is_invalid_date'
+] = 1
+
+#  Purchase <= Approved
+orders_clean.loc[
+    invalid_condition(
+        orders_clean['order_purchase_timestamp'] > orders_clean['order_approved_at']
+    ),
+    'is_invalid_date'
+] = 1
+
+#  Approved <= Carrier
+orders_clean.loc[
+    invalid_condition(
+        orders_clean['order_approved_at'] > orders_clean['order_delivered_carrier_date']
+    ),
+    'is_invalid_date'
+] = 1
+
+#  Carrier <= Customer
+orders_clean.loc[
+    invalid_condition(
+        orders_clean['order_delivered_carrier_date'] > orders_clean['order_delivered_customer_date']
+    ),
+    'is_invalid_date'
+] = 1
+# Delivered nhưng thiếu ngày giao
+missing_delivered = (
+    (orders_clean['order_status'] == 'delivered') &
+    (orders_clean['order_delivered_customer_date'].isna())
+)
+#4. shipping logic
+# Merge order_items + orders
 df = order_items_clean.merge(
-    orders_clean[['order_id', 'order_purchase_timestamp']],
+    orders_clean[['order_id', 'order_purchase_timestamp', 'order_delivered_carrier_date']],
     on='order_id',
     how='left'
 )
-df['is_valid_shipping'] = df['shipping_limit_date'] >= df['order_purchase_timestamp']
+
+# 1. shipping_limit >= purchase
+df['is_valid_shipping'] = (
+    df['shipping_limit_date'] >= df['order_purchase_timestamp']
+)
+
+# 2. shipping delay (days)
 df['shipping_delay_days'] = (
     df['shipping_limit_date'] - df['order_purchase_timestamp']
 ).dt.days
 
-df = df.merge(
-    orders[['order_id', 'order_delivered_carrier_date']],
-    on='order_id',
-    how='left'
-)
-
+# 3. on-time shipping
 df['on_time_shipping'] = (
     df['order_delivered_carrier_date'] <= df['shipping_limit_date']
 )
-# check null for all columns
-print(Orders_clean.isnull().sum())
-Orders_clean['flag_approved']=Orders_clean['order_approved_at'].isnull().astype(int)
-Orders_clean['flag_carrier']=Orders_clean['order_delivered_carrier_date'].isnull().astype(int)
-Orders_clean['flag_customer']=Orders_clean['order_delivered_customer_date'].isnull().astype(int)
-# Chẹck duplicates for order_id and customer_id
-print(Orders_clean['order_id'].duplicated().sum())
-print(Orders_clean['customer_id'].duplicated().sum())
-# Check different values in 'order_status'
-print(Orders_clean['order_status'].value_counts(normalize=True))
-# check range of datetime columns 
-for i in date_cols:
-  print(f'{i} Min date: {Orders_clean[i].min()} and Max date: {Orders_clean[i].max()}')
-
-# Save  cleaned file
-Orders_clean.to_csv('Orders_clean.csv', index=False)
+#5. Null flag 
+print("Missing delivered date:", missing_delivered.sum())
+orders_clean['flag_approved_null'] = orders_clean['order_approved_at'].isna().astype(int)
+orders_clean['flag_carrier_null'] = orders_clean['order_delivered_carrier_date'].isna().astype(int)
+orders_clean['flag_customer_null'] = orders_clean['order_delivered_customer_date'].isna().astype(int)
+#6. Duplicate 
+print("Duplicate order_id:", orders_clean['order_id'].duplicated().sum())
+print("Duplicate customer_id:", orders_clean['customer_id'].duplicated().sum())
+#7. check order_status
+print(orders_clean['order_status'].value_counts(normalize=True))
+#8. Check range of date
+for col in date_cols:
+    print(f"{col}: {orders_clean[col].min()} → {orders_clean[col].max()}")
+#9. Save 
+orders_clean.to_csv('orders_clean.csv', index=False)
