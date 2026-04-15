@@ -33,9 +33,9 @@ SELECT
 
     -- 🔥 lấy từ Orders_clean
     o.is_invalid_date,
-    o.flag_approved,
-    o.flag_carrier,
-    o.flag_customer
+    o.flag_approved_null,
+    o.flag_carrier_null,
+    o.flag_customer_null
 
 FROM Order_items_clean oi
 JOIN Orders_clean o 
@@ -154,7 +154,7 @@ SELECT
     p.payment_sequential,
     p.payment_installments,
 
-    p.flag_invalid_installment,
+    p.flag_invalid_installments,
     p.flag_payment_value
 
 FROM Order_payments_clean p
