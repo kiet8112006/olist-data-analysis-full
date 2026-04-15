@@ -1,11 +1,7 @@
 import pandas as pd
 #1. Load to data
 orders = pd.read_csv('olist_orders_dataset.csv')
-order_items = pd.read_csv('olist_order_items_dataset.csv')
-
 orders_clean = orders.copy()
-order_items_clean = order_items.copy()
-
 print("Shape:", orders_clean.shape)
 orders_clean.info()
 #2. Connvert to datetime
