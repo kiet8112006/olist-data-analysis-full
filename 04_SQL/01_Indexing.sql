@@ -1,63 +1,53 @@
-CREATE TABLE fact_orders (
+CREATE TABLE fact_sale (
     fact_id INT IDENTITY(1,1) PRIMARY KEY,
 
     order_id VARCHAR(50),
+    product_key INT,
+    seller_key INT,
     customer_key INT,
 
     date_key INT,
 
-    purchase_date DATETIME,
-    approved_date DATETIME,
-    carrier_date DATETIME,
-    delivered_date DATETIME,
+    price DECIMAL(18,2),
+    freight_value DECIMAL(18,2),
 
-    total_price DECIMAL(18,2),
-    total_freight DECIMAL(18,2),
-
-    delivery_duration_days INT,
-    delivery_delay_days INT
+    -- 🔥 data quality từ Orders
+    is_invalid_date BIT,
+    flag_approved BIT,
+    flag_carrier BIT,
+    flag_customer BIT
 );
-INSERT INTO fact_orders
+INSERT INTO fact_sale
 SELECT 
-    o.order_id,
+    oi.order_id,
+    dp.product_key,
+    ds.seller_key,
     dc.customer_key,
 
     YEAR(o.order_purchase_timestamp)*10000 
     + MONTH(o.order_purchase_timestamp)*100 
     + DAY(o.order_purchase_timestamp),
 
-    o.order_purchase_timestamp,
-    o.order_approved_at,
-    o.order_delivered_carrier_date,
-    o.order_delivered_customer_date,
+    oi.price,
+    oi.freight_value,
 
-    SUM(oi.price),
-    SUM(oi.freight_value),
+    -- 🔥 lấy từ Orders_clean
+    o.is_invalid_date,
+    o.flag_approved,
+    o.flag_carrier,
+    o.flag_customer
 
-    DATEDIFF(day, o.order_purchase_timestamp, o.order_delivered_customer_date),
-
-    CASE 
-        WHEN o.order_delivered_customer_date IS NOT NULL 
-        THEN DATEDIFF(day, o.order_estimated_delivery_date, o.order_delivered_customer_date)
-        ELSE NULL
-    END
-
-FROM Orders_clean o
-JOIN Order_items_clean oi 
-    ON o.order_id = oi.order_id
+FROM Order_items_clean oi
+JOIN Orders_clean o 
+    ON oi.order_id = o.order_id
+JOIN dim_product dp 
+    ON oi.product_id = dp.product_id
+JOIN dim_seller ds 
+    ON oi.seller_id = ds.seller_id
 JOIN dim_customer dc 
     ON o.customer_id = dc.customer_id
 
-WHERE o.order_status = 'delivered'
-
-GROUP BY 
-    o.order_id,
-    dc.customer_key,
-    o.order_purchase_timestamp,
-    o.order_approved_at,
-    o.order_delivered_carrier_date,
-    o.order_delivered_customer_date,
-    o.order_estimated_delivery_date;
+WHERE o.order_status = 'delivered';
 ---------------------------------------------------------------------------------------
 CREATE TABLE dim_date (
     date_key INT PRIMARY KEY,
@@ -103,7 +93,10 @@ CREATE TABLE fact_order_items (
     date_key INT,
 
     price DECIMAL(18,2),
-    freight_value DECIMAL(18,2)
+    freight_value DECIMAL(18,2),
+
+    -- 🔥 NEW COLUMN
+    flag_free_shipping BIT
 );
 INSERT INTO fact_order_items
 SELECT 
@@ -116,7 +109,10 @@ SELECT
     + DAY(o.order_purchase_timestamp),
 
     oi.price,
-    oi.freight_value
+    oi.freight_value,
+
+    -- 🔥 lấy từ bảng clean
+    oi.flag_free_shipping
 
 FROM Order_items_clean oi
 JOIN Orders_clean o 
@@ -134,7 +130,14 @@ CREATE TABLE fact_payment (
     date_key INT,
 
     payment_type VARCHAR(50),
-    payment_value DECIMAL(18,2)
+    payment_value DECIMAL(18,2),
+
+    -- 🔥 NEW COLUMNS
+    payment_sequential INT,
+    payment_installments INT,
+
+    flag_invalid_installment BIT,
+    flag_payment_value BIT
 );
 INSERT INTO fact_payment
 SELECT 
@@ -145,7 +148,14 @@ SELECT
     + DAY(o.order_purchase_timestamp),
 
     p.payment_type,
-    p.payment_value
+    p.payment_value,
+
+    -- 🔥 thêm mới
+    p.payment_sequential,
+    p.payment_installments,
+
+    p.flag_invalid_installment,
+    p.flag_payment_value
 
 FROM Order_payments_clean p
 JOIN Orders_clean o 
@@ -158,7 +168,16 @@ CREATE TABLE fact_review (
     order_id VARCHAR(50),
     date_key INT,
 
-    review_score INT
+    review_score INT,
+
+    -- 🔥 lấy từ clean
+    flag_valid_review BIT,
+    flag_missing_date BIT,
+
+    review_length INT,
+    response_time_hours INT,
+
+    sentiment VARCHAR(20)
 );
 INSERT INTO fact_review
 SELECT 
@@ -168,7 +187,16 @@ SELECT
     + MONTH(o.order_purchase_timestamp)*100 
     + DAY(o.order_purchase_timestamp),
 
-    r.review_score
+    r.review_score,
+
+    -- 🔥 LẤY THẲNG TỪ CLEAN
+    r.flag_valid_review,
+    r.flag_missing_date,
+
+    r.review_length,
+    r.response_time_hours,
+
+    r.sentiment
 
 FROM Order_reviews_clean r
 JOIN Orders_clean o 
