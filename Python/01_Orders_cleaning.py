@@ -68,21 +68,6 @@ df = order_items_clean.merge(
     on='order_id',
     how='left'
 )
-
-# 1. shipping_limit >= purchase
-df['is_valid_shipping'] = (
-    df['shipping_limit_date'] >= df['order_purchase_timestamp']
-)
-
-# 2. shipping delay (days)
-df['shipping_delay_days'] = (
-    df['shipping_limit_date'] - df['order_purchase_timestamp']
-).dt.days
-
-# 3. on-time shipping
-df['on_time_shipping'] = (
-    df['order_delivered_carrier_date'] <= df['shipping_limit_date']
-)
 #5. Null flag 
 print("Missing delivered date:", missing_delivered.sum())
 orders_clean['flag_approved_null'] = orders_clean['order_approved_at'].isna().astype(int)
