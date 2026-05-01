@@ -1,4 +1,5 @@
 Thông tin về các cột trong dataset Olist.
+
 A. olist_orders_dataset.csv : bảng orders.
 1. Số dòng và cột:
 2. Tên các cột: order_id, customer_id, order_status, order_purchase_timestamp, order_approval_at, order_delivered_carrier_date, order_delivered_customer_date, order_estimated_delivery_date.
