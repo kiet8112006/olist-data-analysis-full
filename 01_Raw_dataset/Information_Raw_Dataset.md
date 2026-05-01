@@ -221,6 +221,146 @@ E. olist_customers_dataset.csv: bảng customers.
 1. Số dòng và cột:
 2. Tên các cột:
    
+   2.1. customer_id.
+   
+   2.1.1. Thông tin: Mã định danh cho khách hàng cho một đơn hàng cụ thể.
+   
+   2.1.2. Kiểu dữ liệu: String.
+   
+   2.1.3. Vai trò: Dùng làm khóa chính để nối với các bảng khác.
+   
+   2.2. customer_unique_id.
+   
+   2.2.1. Thông tin: Mã định danh duy nhất của một khách hàng thực sự.
+   
+   2.2.2. Kiểu dữ liệu: String.
+   
+   2.2.3. Vai trò: Xác định khách hàng thực sự và dùng để phân tích hành vi khách hàng.
+   
+   2.3. customer_state.
+   
+   2.3.1. Thông tin: Bang (vị trí địa lý) của khách hàng sinh sống, nhận hàng.
+   
+   2.3.2. Kiểu dữ liệu: String.
+   
+   2.3.3. Vai trò: Xác định vị trí của khách hàng với mục đích phục vụ cho phân tích.
+   
+   2.4. customer_city.
+   
+   2.4.1. Thông tin: Thành phố (vị trí địa lý) của khách hàng sinh sống, nhận hàng.
+   
+   2.4.2. Kiểu dữ liệu: String.
+   
+   2.4.3. Vai trò: Xác định vị trí của khách hàng với mục đích phục vụ cho phân tích.
+   
+   2.5. customer_zip_code_prefix.
+   
+   2.5.1. Thông tin: 5 chữ số đầu tiên mã bưu điện của khách hàng.
+   
+   2.5.2. Kiểu dữ liệu: Int, khi làm thực tế nên chuyển sang string.
+   
+   2.5.3. Vai trò: Dùng để nối với bảng olist_geolocation_dataset.csv.
+
+F. olist_sellers_dataset.csv: bảng sellers.
+1. Số dòng và cột:
+2. Tên các cột:
+   
+   2.1. seller_id.
+   
+   2.1.1. Thông tin: Mã định danh duy nhất của một người bán.
+   
+   2.1.2. Kiểu dữ liệu: String.
+   
+   2.1.3. Vai trò: Dùng làm khóa chính để nối với bảng khác.
+   
+   2.2. seller_state.
+   
+   2.2.1. Thông tin: Bang (vị trí địa lý) nơi mà người bán hoạt động.
+   
+   2.2.2. Kiểu dữ liệu: String.
+   
+   2.2.3. Vai trò: Dùng để phân tích phân bố người bán và những phân tích sâu, nâng cao khác liên quan đến địa lý.
+   
+   2.3. seller_city.
+   
+   2.3.1. Thông tin: Thành phố (vị trí địa lý) nơi mà người bán hoạt động.
+   
+   2.3.2. Kiểu dữ liệu: String.
+   
+   2.3.3. Vai trò: Dùng để phân tích phân bố người bán và những phân tích sâu, nâng cao khác liên quan đến địa lý.
+   
+   2.4. seller_zip_code_prefix.
+   
+   2.4.1. Thông tin: 5 chữ số đầu tiên mã bưu điện của người bán hàng.
+   
+   2.4.2. Kiểu dữ liệu: Int, nên chuyển sang string.
+   
+   2.4.3. Vai trò: Dùng để nối với bảng olist_geolocation_dataset.csv.
+
+G. olist_geolocation_dataset: bảng geolocation.
+1. Số dòng và cột:
+2. Tên các cột:
+   
+   2.1. geolocation_zip_code_prefix.
+   
+   2.1.1. Thông tin: 5 chữ số đầu tiên mã bưu điện của bảng geolocation.
+   
+   2.1.2. Kiểu dữ liệu: Int, nên chuyển sang string.
+   
+   2.1.3. Vai trò: Dùng để nối toàn bộ geo analysis phục vụ cho phân tích địa lý.
+   
+   2.2. geolocation_lat.
+   
+   2.2.1. Thông tin: Vĩ độ của vị trí tương ứng với zip code.
+
+   2.2.2. Kiểu dữ liệu: Float.
+   
+   2.2.3. Vai trò: Dùng để xác định vị trí của customer, seller trên bản đồ.
+   
+   2.3. geolocation_lng.
+   
+   2.3.1. Thông tin: kinh dộ của vị trí tương ứng với zip code.
+   
+   2.3.2. Kiểu dữ liệu: Float.
+   
+   2.3.3. Vai trò: Dùng để xác định vị trí của customer, seller trên bản đồ.
+   
+   2.4. geolocation_city.
+   
+   2.4.1. Thông tin: Tên thành phố tương ứng với zip code trong bảng geolocation.
+   
+   2.4.2. Kiểu dữ liệu: String.
+   
+   2.4.3. Vai trò: Dùng để phân tích vị trí.
+   
+   2.5. geolocation_state.
+   
+   2.5.1. Thông tin: Tên bang tương ứng với zip code trong bảng geolocation.
+   
+   2.5.2. Kiểu dữ liệu: String.
+   
+   2.5.3. Vai trò: Dùng để phân tích vị trí.
+
+H. olist_products_dataset.csv: bảng products.
+1. Số dòng và cột:
+2. Tên các cột:
+   
+   2.1. product_id.
+   
+   2.1.1. thông tin:
+   
+   2.1.2. Kiểu dữ liệu:
+   
+   2.1.3. Vai trò:
+   
+   
+   
+   
+   
+   
+   
+   
+   
    
     
    
