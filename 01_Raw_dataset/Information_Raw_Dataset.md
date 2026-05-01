@@ -3,9 +3,13 @@ A. olist_orders_dataset.csv : bảng orders.
 1. Số dòng và cột:
 2. Tên các cột: order_id, customer_id, order_status, order_purchase_timestamp, order_approval_at, order_delivered_carrier_date, order_delivered_customer_date, order_estimated_delivery_date.
    2.1. order_id.
+   
    2.1.1. Thông tin: Mã định danh duy nhất của mỗi một đơn hàng.
+   
    2.1.2. Kiểu dữ liệu: String.
+   
    2.1.3. Vai trò: order_id đóng vai trò làm khóa chính của bảng olist_orders_dataset và dùng để join các bảng khác lại với nhau.
+   
    2.2. customer_id.
    2.2.1. Thông tin: Mã định danh khách hàng gắn với mỗi đơn hàng, không phải mã định danh thật sự và mỗi order sẽ có 1 customer_id.
    2.2.2. kiểu dữ liệu: String.
