@@ -70,5 +70,159 @@ A. olist_orders_dataset.csv : bảng orders.
    
 B. olist_order_items_dataset.csv: bảng order items.
 1. Số dòng và cột:
-2. Tên các cột: 
+2. Tên các cột:
+   
+   2.1. order_id.
+   
+   2.1.1. Thông tin: Mã định danh duy nhất của mỗi đơn hàng.
+   
+   2.1.2. Kiểu dữ liệu: String.
+   
+   2.1.3. Vai trò: kết hợp với order_item_id làm khóa chính nối với những bảng khác.
+   
+   2.2. order_item_id.
+   
+   2.2.1. Thông tin: Số thứ tự của item trong cùng 1 order.
+   
+   2.2.2. Kiểu dữ liệu: Int.
+   
+   2.2.3. Vai trò: kết hợp với order_id làm khóa chính trong bảng olist_order_items_dataset.csv.
+   
+   2.3. product_id.
+   
+   2.3.1. Thông tin: Mã định danh duy nhất của mỗi sản phẩm.
+   
+   2.3.2. Kiểu dữ liệu: String.
+   
+   2.3.3. Vai trò: Dùng làm khóa ngoại để nói với bảng olist_products_dataset.csv.
+   
+   2.4. seller_id.
+   
+   2.4.1. Thông tin: Mã định danh duy nhất của người bán.
+   
+   2.4.2. Kiểu dữ liệu: String.
+   
+   2.4.3. Vai trò: Dùng làm khóa ngoại để nối với bảng olist_sellers_dataset.csv.
+   
+   2.5. shipping_limit_date.
+   
+   2.5.1. Thông tin: Thời điểm hạn chót mà người bán phải giao hàng cho đơn vị vận chuyển.
+   
+   2.5.2. Kiểu dữ liệu: Datetime.
+   
+   2.5.3. Vai trò: Đo hiệu suất của người bán và sự chậm trễ của hệ thống giao hàng.
+   
+   2.6. price.
+   
+   2.6.1. Thông tin: Giá của sản phẩm (item) trong mỗi order.
+   
+   2.6.2. Kiểu dữ liệu: Float.
+   
+   2.6.3. Vai trò: Dùng để tính toán doanh thu và phân tích theo nhiều chiều khác nhau.
+   
+   2.7. freight_value.
+   
+   2.7.1. Thông tin: Phí vận chuyển của từng item trong order.
+   
+   2.7.2. Kiểu dữ liệu: Float.
+   
+   2.7.3. Vai trò: Dùng để tính toán doanh thu và phân tích nhiều chiều khác nhau.
+
+
+C. olist_order_reviews_dataset.csv: bảng order reviews.
+1. Số dòng và cột:
+2. Tên các cột:
+   
+   2.1. review_id.
+   
+   2.1.1. Thông tin: Mã định danh duy nhất của 1 bài đánh giá.
+   
+   2.1.2. Kiểu dữ liệu: string.
+   
+   2.1.3. Vai trò: Dùng để làm khóa chính nối với bảng khác (kết hợp với order_id).
+   
+   2.2. order_id.
+   
+   2.2.1. Thông tin: Mã định danh duy nhất của mỗi đơn hàng.
+   
+   2.2.2. Kiểu dữ liệu: String.
+   
+   2.2.3. Vai trò: Dùng làm khóa chính nối với bảng khác (kết hợp với review_id).
+   
+   2.3. review_score.
+   
+   2.3.1. Thông tin: Điểm đánh giá khách hàng cho đơn hàng.
+   
+   2.3.2. Kiểu dữ liệu: Int.
+   
+   2.3.3. Vai trò: Dùng trong phân tích, đánh giá chất lượng dịch vụ, trải nghiệm khách hàng.
+   
+   2.4. review_comment_title.
+   
+   2.4.1. Thông tin: Tiêu đề ngắn của review do khách hàng đánh giá viết.
+   
+   2.4.2. Kiểu dữ liệu: String.
+   
+   2.4.3. Vai trò: Phân tích cảm xúc khách hàng, có thể kết hợp với review_score.
+   
+   2.5. review_comment_message.
+   
+   2.5.1. Thông tin: Nội dung chi tiết review mà khách hàng viết.
+   
+   2.5.2. Kiểu dữ liệu: String.
+   
+   2.5.3. Vai trò: Dùng để phâ tích cảm xúc và trải nghiệm của khách hàng.
+
+D. olist_order_payments_dataset.csv: bảng order payments.
+1. Số dòng và cột:
+2. Tên các cột:
+   
+   2.1. order_id.
+   
+   2.1.1. Thông tin: Mã định danh duy nhất của mỗi đơn hàng.
+   
+   2.1.2. Kiểu dữ liệu: String.
+   
+   2.1.3. Vai trò: Dùng làm khóa chính để nối với bảng khác (kết hợp với payment_sequential).
+   
+   2.2. payment_sequential.
+   
+   2.2.1. Thông tin: Số thứ tự của các lần thanh toán trong cùng 1 order.
+   
+   2.2.2. Kiểu dữ liệu: Int.
+   
+   2.2.3. Vai trò: Dùng làm khóa chính để nối với mấy bảng khác (kết hợp với order_id).
+   
+   2.3. payment_type.
+   
+   2.3.1. Thông tin: Phương thức thanh toán mà khách hàng sử dụng cho đơn hàng.
+   
+   2.3.2. Kiểu dữ liệu: string.
+   
+   2.3.3. Vai trò: Dùng để phân tích doanh thu và phân tích hành vi thanh toán của khách hàng.
+   
+   2.4. payment_installments.
+   
+   2.4.1. Thông tin: Số kỳ trả góp mà khách hàng chọn cho đơn hàng của họ.
+   
+   2.4.2. Kiểu dữ liệu: Int.
+   
+   2.4.3. Vai trò: Dùng để phân tích tài chính và hành vi trả góp.
+   
+   2.5. payment_value.
+   
+   2.5.1. Thông tin: Số tiền mà khách hàng thực sự thanh toán cho 1 lần payment.
+   
+   2.5.2. Kiểu dữ liệu: Float.
+   
+   2.5.3. Vai trò: Dùng để tính doanh thu chuẩn và phân tích theo nhiều hướng khác.
+
+E. olist_customers_dataset.csv: bảng customers.
+1. Số dòng và cột:
+2. Tên các cột:
+   
+   
+    
+   
+   
    
