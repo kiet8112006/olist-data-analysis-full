@@ -2,7 +2,7 @@ Thông tin về các cột trong dataset Olist.
 
 A. olist_orders_dataset.csv : bảng orders.
 1. Số dòng và cột:
-2. Tên các cột: order_id, customer_id, order_status, order_purchase_timestamp, order_approval_at, order_delivered_carrier_date, order_delivered_customer_date, order_estimated_delivery_date.
+2. Tên các cột: 
    
    2.1. order_id.
    
@@ -347,11 +347,99 @@ H. olist_products_dataset.csv: bảng products.
    
    2.1. product_id.
    
-   2.1.1. thông tin:
+   2.1.1. Thông tin: Mã định danh duy nhất của mỗi sản phẩm.
    
-   2.1.2. Kiểu dữ liệu:
+   2.1.2. Kiểu dữ liệu: String.
    
-   2.1.3. Vai trò:
+   2.1.3. Vai trò: Làm khóa chính trong bảng và nối với những bảng khác.
+
+   2.2. product_category_name.
+
+   2.2.1. Thông tin: Danh mục của sản phẩm.
+
+   2.2.2. Kiểu dữ liệu: String.
+
+   2.2.3. Vai trò: nối với bảng phiên dịch để hữu ích.
+
+   2.3. product_name_lenght.
+
+   2.3.1. Thông tin: Độ dài tên sản phẩm.
+
+   2.3.2. Kiểu dữ liệu: Int.
+
+   2.3.3. Vai trò: Nó nằm trong những thuộc tính của sản phẩm.
+
+   2.4. product_description_lenght.
+
+   2.4.1. Thông tin: Độ dài phần mô tả sản phẩm.
+
+   2.4.2. Kiểu dữ liệu: Int.
+
+   2.4.3. Vai trò: Nó nằm trong những thuộc tính của sản phẩm.
+
+   2.5. product_photos_qty.
+
+   2.5.1. Thông tin: Số lượng ảnh của sản phẩm được đăng.
+
+   2.5.2. Kiểu dữ liệu: Int.
+
+   2.5.3. Vai trò: Nó nằm trong những thuộc tính của sản phẩm.
+
+   2.6. product_weight_g.
+
+   2.6.1. Thông tin: Trọng lượng sản phẩm (đơn vị gram).
+
+   2.6.2. kiểu dữ liệu: Float.
+
+   2.6.3. Vai trò: Nó nằm trong thuộc tính của sản phẩm.
+
+   2.7. product_length_cm.
+
+   2.7.1. Thông tin: Chiều dài sản phẩm (đơn vị cm).
+
+   2.7.2. Kiểu dữ liệu: Float.
+
+   2.7.3. Vai trò: Nó nằm trong thuộc tính của sản phẩm.
+
+   2.8. product_height_cm.
+
+   2.8.1. Thông tin: Chiều cao của sản phẩm (đơn vị cm).
+
+   2.8.2. Kiểu dữ liệu: Float.
+
+   2.8.3. Vai trò: Nó nằm trong thuộc tính của sản phẩm.
+
+   2.9. product_width_cm.
+
+   2.9.1. Thông tin: Chiều rộng của sản phẩm.
+
+   2.9.2. Kiểu dữ liệu: Float.
+
+   2.9.3. Vai trò: Nó nằm trong thuộc tính của sản phẩm.
+
+
+K. product_category_name_translation.csv: bảng phiên dịch của products.
+1. Số dòng và cột:
+2. Tên các cột:
+   
+   2.1. product_category_name.
+   
+   2.1.1. Thông tin: Tên sản phẩm băng tiếng gốc Bồ Đào Nha.
+   
+   2.1.2. Kiểu dữ liệu: String.
+   
+   2.1.3. Vai trò: Dùng để so với tên phiên dịch.
+
+   2.2. product_category_name_english.
+   
+   2.2.1 Thông tin: Tên danh mục sản phẩm phiên dịch sang tiếng anh.
+   
+   2.2.2. Kiểu dữ liệu: String.
+   
+   2.2.3. vai trò: Dùng để chuẩn hóa tên sản phẩm và đọc cho thuận tiện.
+   
+   
+   
    
    
    
