@@ -133,7 +133,155 @@ Kết quả: Không ghi nhận số dòng nào bị lỗi logic này.
 B. olist_order_items_dataset.csv: bảng order items.
 1. Kiểm tra null.
 python'
+import pandas as pd
+order_items=pd.read_csv('olist_order_items_dataset.csv')
+print(order_items.isnull().sum())
+'
+
+Kết quả: Tất cả các cột đều không có giá trị null.
+
+2. Kiểm tra kiểu dữ liệu.
+python'
+import pandas as pd
+order_items=pd.read_csv('olist_order_items_dataset.csv')
+order_items.info()
+'
+
+Kết quả: Cột shipping_limit_date có kiểu dữ liệu là object cần chuyển sang datetime.
+
+3. Kiểm tra giá trị trùng lặp.
+python'
+import pandas as pd
+order_items=pd.read_csv('olist_order_items_dataset.csv')
+print(order_items.duplicated(subset=['order_id', 'order_item_id']).sum())
+'
+
+Kết quả: Không có dòng nào bị trùng lặp dữ liệu.
+
+4. Kiểm tra vùng giá trị của cột shipping_limit_date.
+python'
+import pandas as pd
+order_items=pd.read_csv('olist_order_items_dataset.csv')
+order_items['shipping_limit_date']=pd.to_datetime(order_items['shipping_limit_date'])
+print(order_items['shipping_limit_date'].agg(['min', 'max']))
+'
+
+Kết quả: Min, max ngày hợp lệ.
+5. Kiểm tra các giá trị của cột price và freight_value.
+python'
+import pandas as pd
+order_items=pd.read_csv('olist_order_items_dataset.csv')
+print(order_items[['price', 'freight_value']].describe())
+'
+
+Kết quả: Cả hai cột đều có giá trị cực lớn, nhìn chung không có giá trị nhỏ hơn 0. Nhưng cần xem xét kỹ thêm về vấn đề phân phối do cả hai cột đều không phân phối chuẩn.
+
+C. olist_order_reviews_dataset.csv: bảng order reviews.
+
+1. Kiểm tra giá trị null.
+python'
+import pandas as  pd
+order_reviews=pd.read_csv('olist_order_reviews_dataset.csv')
+print(order_reviews.isna().sum())
+'
+
+Kết quả: Tất cả các cột tương đối sạch, không có giá trị null ngoại trừ hai cột review_comment_title và review_comment_message có nhiều giá trị null có thể chấp nhận được.
+
+2. Kiểm tra kiểu dữ liệu.
+python'
+import pandas as  pd
+order_reviews=pd.read_csv('olist_order_reviews_dataset.csv')
+order_reviews.info()
+'
+
+Kết quả: Hai cột review_creation_date và review_answer_timestamp đều có kiểu dữ liệu là object cần chuyển sang datetime.
+
+3. Kiểm tra trùng lặp.
+python'
+import pandas as  pd
+order_reviews=pd.read_csv('olist_order_reviews_dataset.csv')
+print(order_reviews.duplicated(subset=['review_id', 'order_id']).sum())
+'
+
+Kết quả: Không có dòng nào bị trùng lặp dữ liệu.
+
+4. Kiểm tra review_score.
+python'
+import pandas as  pd
+order_reviews=pd.read_csv('olist_order_reviews_dataset.csv')
+counts=order_reviews['review_score'].value_counts()
+pct=order_reviews['review_score'].value_counts(normalize=True)
+
+result=pd.concat([counts, pct], axis=1)
+result.columns=['count', 'percentage']
+print(result)
+'
+Kết quả: Không có giá trị nào phi logic của cột review_score.
+
+5. Kiểm tra khoảng giá trị của hai cột review_creation_date, review_answer_timestamp.
+python'
+import pandas as  pd
+order_reviews=pd.read_csv('olist_order_reviews_dataset.csv')
+print(order_reviews[['review_creation_date', 'review_answer_timestamp']].agg(['min', 'max']))
+'
+
+Kết quả: Min, max của hai cột có giá trị hợp lệ.
+
+D. olist_order_payments_dataset.csv: bảng order payments.
+
+1. Kiểm tra giá trị null.
+python'
+import pandas as pd
+order_payments=pd.read_csv('olist_order_payments_dataset.csv')
+print(order_payments.isna().sum())
+'
+Kết quả: Không có cột nào có giá trị bị thiếu.
+
+2. Kiểm tra kiểu dữ liệu.
+python'
+import pandas as pd
+order_payments=pd.read_csv('olist_order_payments_dataset.csv')
+order_payments.info()
+'
+Kết quả: Tất cả các cột đều đúng dữ liệu.
+
+3. Kiểm tra trùng lặp.
+python'
+import pandas as pd
+order_payments=pd.read_csv('olist_order_payments_dataset.csv')
+print(order_payments.duplicated(subset=['order_id', 'payment_sequential']).sum())
+'
+
+Kết quả: Không có dòng bị trùng dữ liệu.
+
+4. Kiểm tra các giá trị của các cột như: payment_sequential, payment_value, payment_installments.
+python'
+import pandas as pd
+order_payments=pd.read_csv('olist_order_payments_dataset.csv')
+counts=order_payments['payment_sequential'].value_counts()
+pct=order_payments['payment_sequential'].value_counts(normalize=True)
+result=pd.concat([counts, pct], axis=1)
+result.columns=['count', 'percentage']
+print(result)
+'
+
+Kết quả: Xuất hiện vài giá trị khả nghi đối với cột payment_sequential, cần kiểm tra kỹ.
+
+python'
+import pandas as pd
+order_payments=pd.read_csv('olist_order_payments_dataset.csv')
+counts=order_payments['payment_installments'].value_counts()
+pct=order_payments['payment_installments'].value_counts(normalize=True)
+result=pd.concat([counts, pct], axis=1)
+result.columns=['count', 'percentage']
+print(result)
+'
+
+Kết quả: Nhìn chung số kì trả góp từ 0 đến 24, cần kiểm tra kỹ với số kỳ trả góp là 0 và các giá trị lớn để phát hiện kịp thời ra những điểm bất thường.
+
+python'
 
 '
 
 Kết quả:
+
