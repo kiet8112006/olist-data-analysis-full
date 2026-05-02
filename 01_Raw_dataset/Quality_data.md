@@ -61,9 +61,66 @@ print(orders['order_approved_at'].agg(['min', 'max']))
 print('logic_num:', (orders['order_approved_at'] > orders['order_purchase_timestamp']).sum())
 '
 
-Kết quả: Min, max của hai cột order_purchase_timestamp, order_approved_at đều hợp lệ và Range =772 ngày. Có tổng cộng là 97985 dòng bị lỗi logic thời gian.
+Kết quả: Min, max của hai cột order_purchase_timestamp, order_approved_at đều hợp lệ. Có tổng cộng là 97985 dòng bị lỗi logic thời gian.
 
 5.2. order_approved_at > order_delivered_carrier_date.
 python'
+import pandas as pd
+orders=pd.read_csv("olist_orders_dataset.csv")
+orders[' order_delivered_carrier_date']=pd.to_datetime(orders['order_purchase_timestamp'])
+orders['order_approved_at']=pd.to_datetime(orders['order_approved_at'])
+
+print(orders[' order_delivered_carrier_date'].agg(['min','max']))
+print(orders['order_approved_at'].agg(['min', 'max']))
+print('logic_num:', (orders['order_approved_at'] > orders[' order_delivered_carrier_date']).sum())
+'
+
+Kết quả: Min, max của hai cột order_approved_at, order_delivered_carrier_date đều hợp lệ. Có tổng cộng là 97985 dòng bị lỗi logic thời gian.
+
+5.3. order_delivered_carrier_date > order_delivered_customer_date.
+python'
+import pandas as pd
+orders=pd.read_csv("olist_orders_dataset.csv")
+orders['order_delivered_carrier_date']=pd.to_datetime(orders['order_delivered_carrier_date'])
+orders['order_delivered_customer_date']=pd.to_datetime(orders['order_delivered_customer_date'])
+
+print(orders['order_delivered_customer_date'].agg(['min','max']))
+print(orders['order_delivered_carrier_date'].agg(['min', 'max']))
+print('logic_num:', (orders['order_delivered_carrier_date'] > orders['order_delivered_customer_date']).sum())
+'
+
+Kết quả: Min, max của hai cột order_delivered_carrier_date, order_delivered_customer_date đều hợp lệ. Có tổng cộng là 23 dòng bị lỗi logic thời gian.
+
+5.4. order_delivered_customer_date > order_estimated_delivery_date.
+python'
+import pandas as pd
+orders=pd.read_csv("olist_orders_dataset.csv")
+orders['order_estimated_delivery_date']=pd.to_datetime(orders['order_estimated_delivery_date'])
+orders['order_delivered_customer_date']=pd.to_datetime(orders['order_delivered_customer_date'])
+
+print(orders['order_delivered_customer_date'].agg(['min','max']))
+print(orders['order_estimated_delivery_date'].agg(['min', 'max']))
+print('logic_num:', (orders['order_estimated_delivery_date'] < orders['order_delivered_customer_date']).sum())
+'
+
+Kết quả: Min, max của hai cột order_delivered_customer_date, order_estimated_delivery_date đều hợp lý. Có tổng cộng là 7827 dòng bị lỗi logic về thời gian.
+
+5.5. order_purchase_timestamp > order_delivered_customer_date và order_status='delivered'.
+python'
+import pandas as pd
+orders=pd.read_csv("olist_orders_dataset.csv")
+orders['order_delivered_customer_date']=pd.to_datetime(orders['order_delivered_customer_date'])
+orders['order_purchase_timestamp']=pd.to_datetime(orders['order_purchase_timestamp'])
+print('logic_num:', ((orders['order_purchase_timestamp'] > orders['order_delivered_customer_date']) &(
+    orders['order_status']=='delivered'
+)).sum())
+'
+Kết quả: Không ghi nhận số dòng nào bị lỗi logic này.
+
+B. olist_order_items_dataset.csv: bảng order items.
+1. Kiểm tra null.
+python'
 
 '
+
+Kết quả:
