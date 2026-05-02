@@ -280,8 +280,88 @@ print(result)
 Kết quả: Nhìn chung số kì trả góp từ 0 đến 24, cần kiểm tra kỹ với số kỳ trả góp là 0 và các giá trị lớn để phát hiện kịp thời ra những điểm bất thường.
 
 python'
-
+import pandas as pd
+order_payments=pd.read_csv('olist_order_payments_dataset.csv')
+print(order_payments['payment_value'].describe())
 '
 
-Kết quả:
+Kết quả: Không ghi nhận giá trị âm, có nhiều giá trị bất thường, cần kiểm tra kỹ.
+
+5. Kiểm tra các giá trị khác nhau của payment_type.
+python'
+import pandas as pd
+order_payments=pd.read_csv('olist_order_payments_dataset.csv')
+counts=order_payments['payment_type'].value_counts()
+pct=order_payments['payment_type'].value_counts(normalize=True)
+result=pd.concat([counts, pct], axis=1)
+result.columns=['count', 'percentage']
+print(result)
+'
+
+Kết quả: Phần lớn đa số là credit_card là 76795 (73.92%), ngoài ra có not_defined là 3 chiếm tỷ trọng rất nhỏ.
+
+E. olist_customers_dataset.csv: bảng customers.
+
+1. Kiểm tra null.
+python'
+import pandas as pd
+customers=pd.read_csv('olist_customers_dataset.csv')
+print(customers.isnull().sum())
+'
+
+Kết quả: Dữ liệu sạch, không có xuất hiện giá trị null ở tất cả các cột.
+
+2. Kiểm tra kiểu dữ liệu.
+python'
+import pandas as pd
+customers=pd.read_csv('olist_customers_dataset.csv')
+customers.info()
+'
+Kết quả: Hầu hết tất cả các cột đều có kiểu dữ liệu đúng nhưng cần để tâm đến kiểu dữ liệu int của cột customer_zip_code_prefix.
+
+3. Kiểm tra trùng lặp.
+python'
+import pandas as pd
+customers=pd.read_csv('olist_customers_dataset.csv')
+print(customers.duplicated(subset=['customer_id']).sum())
+'
+
+Kết quả: Không xuất hiện dòng trùng lặp giá trị.
+
+
+4. Kiểm tra customer_zip_code_prefix.
+python'
+import pandas as pd
+customers=pd.read_csv('olist_customers_dataset.csv')
+customers['customer_zip_code_prefix'] = (
+    customers['customer_zip_code_prefix']
+    .astype(str)
+    .str.zfill(5)
+)
+print(customers['customer_zip_code_prefix'].str.len().value_counts())
+'
+
+Kết quả: các giá trị trong customer_zip_code_prefix đều thỏa mãn.
+
+5. Kiểm tra customer_state, customer_city.
+python'
+import pandas as pd
+customers=pd.read_csv('olist_customers_dataset.csv')
+print(customers['customer_state'].unique())
+print(customers['customer_state'].str.len().value_counts())
+print(customers['customer_state'].str.isupper().value_counts())
+
+import pandas as pd
+customers=pd.read_csv('olist_customers_dataset.csv')
+print(customers['customer_city'].nunique())
+print(customers['customer_city'].value_counts().head(10))
+print(customers['customer_city'].str.lower().value_counts().head(10))
+print((customers['customer_city'].str.strip() != customers['customer_city']).value_counts())
+'
+
+Kết quả: cột customer_state sạch, cột customer_city sạch. Không ghi nhận lỗi format.
+
+F. olist_sellers_dataset.csv: bảng sellers.
+
+1. 
 
