@@ -363,5 +363,57 @@ Kết quả: cột customer_state sạch, cột customer_city sạch. Không ghi
 
 F. olist_sellers_dataset.csv: bảng sellers.
 
-1. 
+1. Check null của các cột.
+python'
+import pandas as pd
+sellers=pd.read_csv('olist_sellers_dataset.csv')
+print(sellers.isnull().sum())
+'
+Kết quả: Tất cả các cột đều không có giá trị null.
+
+2. Check kiểu dữ liệu của các cột.
+python'
+import pandas as pd
+sellers=pd.read_csv('olist_sellers_dataset.csv')
+sellers.info()
+'
+Kết quả: Tất cả các cột đều đúng kiểu dữ liệu nhưng trừ cột seller_zip_code_prefix kiểu int nên chuyển sang kiểu string.
+
+3. Kiểm tra seller_zip_code_prefix.
+python'
+import pandas as pd
+sellers=pd.read_csv('olist_sellers_dataset.csv')
+sellers['seller_zip_code_prefix'] = (
+    sellers['seller_zip_code_prefix']
+    .astype(str)
+    .str.zfill(5)
+)
+print(sellers['seller_zip_code_prefix'].str.len().value_counts())
+'
+
+Kết quả: Tất cả các giá trị trong cột đều đúng và hợp lý.
+
+4. Kiểm tra seller_state, seller_city.
+python'
+import pandas as pd
+sellers=pd.read_csv('olist_sellers_dataset.csv')
+print(sellers['seller_state'].unique())
+print(sellers['seller_state'].str.len().value_counts())
+print(sellers['seller_state'].str.isupper().value_counts())
+print(sellers['seller_city'].nunique())
+print(sellers['seller_city'].value_counts().head(10))
+print(sellers['seller_city'].str.lower().value_counts().head(10))
+print((sellers['seller_city'].str.strip() != sellers['seller_city']).value_counts())
+'
+
+Kết quả: Tất cả các giá trị trong cột đều hợp lý.
+
+G. olist_products_dataset.csv: bảng products.
+
+1. Check null tất cả các cột.
+python'
+
+'
+
+Kết quả:
 
