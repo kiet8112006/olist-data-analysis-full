@@ -1,1 +1,70 @@
+Đây là phần trình bày tất cả các measure liên quan đến Customers dashboard.
 
+1. C_New_Customers.
+Tính số lượng khách hàng mới.
+
+C_New_Customers =
+CALCULATE(
+    DISTINCTCOUNT(fact_sale[customer_key]),
+    FILTER(
+        fact_sale,
+        fact_sale[purchase_number] = 1 &&
+        fact_sale[is_delivered] = TRUE()
+    )
+)
+
+2. C_New_Customers_LY.
+
+C_New_Customers_LY =
+CALCULATE(
+    [C_New_Customers],
+    SAMEPERIODLASTYEAR(dim_date[full_date])
+)
+
+3. C_New_Customers_Growth_YoY.
+
+C_New_Customers_Growth_YoY =
+VAR LY = [C_New_Customers_LY]
+RETURN
+IF(
+    LY = 0,
+    BLANK(),
+    DIVIDE([C_New_Customers] - LY, LY)
+)
+
+4. C_Returning_Customers.
+
+C_Returning_Customers = [R_Customers]-[C_New_Customers]
+
+5. C_Returning_Customers_LY.
+
+C_Returning_Customers_LY =
+CALCULATE(
+    [C_Returning_Customers],
+    SAMEPERIODLASTYEAR(dim_date[full_date])
+)
+
+6. C_Returning_Customers_Growth_YoY.
+
+C_Returning_Customers_Growth_YoY =
+VAR LY = [C_Returning_Customers_LY]
+RETURN
+IF(
+    LY = 0,
+    BLANK(),
+    DIVIDE([C_Returning_Customers] - LY, LY)
+)
+
+7. C_returning_Customers_Rate.
+
+C_Returning_Customers_Rate = divide([C_Returning_Customers], [R_Customers])
+
+8. C_Rank_Customers.
+
+C_Rank_Customers = var a = rankx(allselected(dim_date[month]),[R_Customers],,desc, Dense) return if ( a <=1,"#0B3C5D", "#CFCFCF")
+
+9. C_Rank_Customers_Products.
+
+C_Rank_Customers_Products = var a = rankx(allselected(dim_product[product_category_name_english]), [C_New_Customers],,DESC,Dense) RETURN if (a <=3, "#0B3C5D", "#CFCFCF")
+10. C_Rank_Customers_State.
+C_Rank_Customers_State = var a = rankx(allselected(dim_customer[customer_state]), [C_New_Customers],,DESC,Dense) RETURN if (a <=3, "#0B3C5D", "#CFCFCF")
