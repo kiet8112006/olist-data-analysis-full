@@ -410,10 +410,26 @@ Kết quả: Tất cả các giá trị trong cột đều hợp lý.
 
 G. olist_products_dataset.csv: bảng products.
 
-1. Check null tất cả các cột.
+1. Kiểm tra null tất cả các cột.
+python'
+import pandas as pd
+products=pd.read_csv('olist_products_dataset.csv')
+print(products.isnull().sum())
+'
+
+Kết quả: Đa số các cột đều không có giá trị null ngoài trừ các cột như product_category_name, product_name_lenght, product_description_lenght, product_photos_qty.
+
+2. Kiểm tra giá trị trùng lặp.
+python'
+import pandas as pd
+products=pd.read_csv('olist_products_dataset.csv')
+print(products.duplicated(subset=['product_id']).sum())
+'
+
+Kết quả: Không có giá trị trùng lặp ở cột product_id.
+
+3. Kiểm tra kiểu dữ liệu của các cột.
 python'
 
 '
-
-Kết quả:
 
