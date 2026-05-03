@@ -1,7 +1,6 @@
 Đây là phần sẽ tập trung mô tả tất cả các measure được sử dụng trong trang Revenue.
 
 1. R_Revenue.
-
 Tổng doanh thu bằng giá sản phẩm + phí giao hàng. Nhưng chỉ tính những đơn giao thành công.
 
 R_Revenue = 
@@ -9,11 +8,9 @@ CALCULATE(
     SUM(fact_sale[price]) + SUM(fact_sale[freight_value]),
     fact_sale[is_delivered] = TRUE()
 )
-
 Hàm calculate thay đổi filter theo context. Tính tổng giá sản phẩm và phí giao đối với những đơn giao thành công.
 
 2. R_Revenue_LY.
-
 Tính doanh thu năm trước.
 
 R_Revenue_LY = 
@@ -21,11 +18,9 @@ CALCULATE(
     [R_Revenue],
     SAMEPERIODLASTYEAR(dim_date[Date])
 )
-
 Tự xử lý theo ngày, tháng, quý.
 
 3. R_Revenue_Growth_YoY.
-
 Tính tăng trưởng doanh thu theo năm.
 
 R_Revenue_Growth_YoY = 
@@ -40,13 +35,11 @@ SWITCH(
 )
 
 4. R_Orders.
-
 Tính số đơn hàng đã giao.
 
 R_Orders = calculate(DISTINCTCOUNT(fact_sale[order_id]), fact_sale[is_delivered]=true())
 
 5. R_Orders_LY.
-
 Tính số đơn hàng so với năm trước.
 
 R_Orders_LY = 
@@ -56,7 +49,6 @@ CALCULATE(
 )
 
 6. R_Orders_Growth_YoY.
-
 Tính số đơn hàng tăng trưởng theo năm.
 
 R_Orders_Growth_YoY = 
@@ -71,13 +63,11 @@ SWITCH(
 )
 
 7. R_AOV.
-
 Tính giá trị đơn hàng trung bình.
 
 R_AOV = divide([R_Revenue],[R_Orders], 0)
 
 8. R_AOV_YoY.
-
 Tính giá tri đơn hàng trung bình theo năm.
 
 R_AOV_LY = 
@@ -87,13 +77,11 @@ CALCULATE(
 )
 
 9. R_Customers.
-
 Tính số khách hàng với điều kiện đơn giao thành công.
 
 R_Customers = calculate(distinctcount(fact_sale[customer_key]),fact_sale[is_delivered]=true())
 
 10. R_Customers_LY.
-
 Tính số khách hàng theo từng năm.
 
 R_Customers_LY = 
@@ -103,7 +91,6 @@ CALCULATE(
 )
 
 11. R_Customers_Growth_YoY.
-
 Tính số khách hàng tăng trưởng theo năm.
 
 R_Customers_Growth_YoY = 
@@ -118,19 +105,16 @@ SWITCH(
 )
 
 12. R_Rank_Revenue_Orders_AOV_Chart.
-
 Dùng để tạo highlight cột có giá trị cao nhất.
 
 R_Rank_Revenue_Orders&AOV_Chart = var a = rankx(allselected(dim_date[month]),[R_Revenue],,desc, Dense) return if ( a <=1,"#0B3C5D", "#CFCFCF")
 
 13. R_Rank_Revenue_State.
-
 Dùng để highlight 3 cột có giá trị cao nhất.
 
 R_Rank_Revenue_State = var a =rankx(allselected(dim_customer[customer_state]), [R_Revenue],, desc, dense) return if (a <=3,"#0B3C5D", "#CFCFCF")
 
 14. R_Rank_Revenue_Products.
-
 Dùng để highlight 3 cột có giá trị cao nhất.
 
 R_Rank_Revenue_Products = var a=rankx(ALLSELECTED(dim_product[product_category_name_english]), [R_Revenue],,desc, Dense) return if (a <=3, "#0B3C5D", "#CFCFCF")
