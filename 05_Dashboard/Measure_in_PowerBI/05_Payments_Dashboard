@@ -1,1 +1,26 @@
+Đây là phần tổng hợp tất cả các measure liên quan đến Payments dashboard.
 
+1. Pm_Total_Payment.
+Dùng để tính tổng số tiền thực tế khách trả.
+
+Pm_Total_Payment = sum(fact_payment[payment_value])
+
+2. Pm_Avg_Installments.
+Dùng để tính số kỳ trả góp trung bình của khách hàng.
+
+Pm_Avg_Installments = AVERAGE(fact_payment[payment_installments])
+
+3. Pm_Rank_Payment_Value.
+Dùng để highlight cột có có doanh thu cao.
+
+Pm_Rank_Payment_Value = var a=rankx(allselected(dim_date[month]), [Pm_Total_Payment],,DESC,Dense) return if (a <=1, "#0B3C5D", "#CFCFCF")
+
+4. Pm_Rank_Payment_Installments.
+Dùng để highlight cột có số kì trả góp cao.
+
+Pm_Rank_Payment_Installments = var a=rankx(allselected(dim_date[month]), [Pm_Avg_Installments],,DESC,Dense) return if (a <=1, "#0B3C5D", "#CFCFCF")
+
+5. Pm_Payment_type.
+Dùng để highlight cột ngang có doanh thu cao.
+
+Pm_Payment_Type = var a =rankx(allselected(fact_payment[payment_type]), [Pm_Total_Payment],,DESC,Dense) return if (a <=1, "#0B3C5D", "#CFCFCF")
