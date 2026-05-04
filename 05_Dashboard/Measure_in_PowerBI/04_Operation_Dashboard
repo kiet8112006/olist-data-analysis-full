@@ -1,1 +1,49 @@
+Đây là phần tổng hợp measure của Operation dashboard.
 
+1. O_Delay_Rate.
+Tính tỷ lệ giao trễ.
+
+O_Delay_Rate = DIVIDE(
+    CALCULATE(COUNTROWS(fact_sale), fact_sale[is_late_delivery] =true()),
+    COUNTROWS(fact_sale)
+)
+
+2. O_Delay_Rate_LY.
+Tính tỷ lệ giao trễ so với năm trước.
+
+O_Delay_Rate_LY = 
+CALCULATE(
+    [O_Delay_Rate],
+    SAMEPERIODLASTYEAR(dim_date[full_date])
+)
+
+3. O_Delay_Rate_YoY.
+Tính tỷ lệ giao trễ theo tăng trưởng năm.
+
+O_Delay_Rate_YoY = 
+VAR a =DIVIDE(
+        [O_Delay_Rate] - [O_Delay_Rate_LY],
+        [O_Delay_Rate_LY])
+RETURN
+IF(ISBLANK([O_Delay_Rate_LY]),
+    BLANK(),
+    IF(a >= 1, 1, a))
+
+4. O_Rank_Delivered_days.
+Dùng để highlight những cột có nhiều ngày delivered.
+
+O_Rank_Delivered_days = var a=rankx(ALLSELECTED(dim_date[month]),[O_Avg_Delivered_days],,desc, Dense) return if (a <=3, "#0B3C5D", "#CFCFCF")
+
+5. O_Rank_Delay_Rate.
+Dùng để highlight cột có tỷ lệ giao trễ cao.
+
+O_Rank_Delay_Rate = var a=rankx(ALLSELECTED(dim_date[month]), [O_Delay_Rate],,desc, Dense) return if (a <=3, "#0B3C5D", "#CFCFCF")
+
+6. O_Rank_Delay_state.
+Dùng để highlight cột thanh ngang có tỷ lệ giao trễ cao.
+
+O_Rank_Delay_state = var a=rankx(ALLSELECTED(dim_seller[seller_state]), [O_Delay_Rate],,desc, Dense) return if (a <=3, "#0B3C5D", "#CFCFCF")
+
+7. O_Rank_Ship_Rating
+Dùng để highlight những cột có phí ship cao.
+O_Rank_Ship_Rating = var a=rankx(ALLSELECTED(dim_date[month]), [P_Avg_Rating],,desc, Dense) return if (a <=3, "#0B3C5D", "#CFCFCF")
