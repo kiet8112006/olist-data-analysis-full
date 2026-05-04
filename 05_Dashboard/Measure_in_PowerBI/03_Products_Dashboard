@@ -1,1 +1,73 @@
+Đây là phần tổng hợp tất các các measure liên quan đến Products Dashboard.
 
+1. P_Avg_Rating.
+Tính chỉ số trung bình của review_score.
+
+P_Avg_Rating = 
+AVERAGE(fact_review_detail[review_score])
+
+2. P_Rating_LY.
+Tính điểm trung bình của review_score so với năm trước.
+
+P_Rating_LY = 
+CALCULATE(
+    [P_Avg_Rating],
+    SAMEPERIODLASTYEAR(dim_date[full_date])
+)
+
+3. P_Avg_Rating_YoY.
+Tính chỉ số trung bình tăng trưởng theo năm của review_score.
+
+P_Avg_Rating_YoY = 
+VAR a =
+    DIVIDE([P_Avg_Rating] - [P_Rating_LY],[P_Rating_LY])
+RETURN
+SWITCH(
+    TRUE(),
+    ISBLANK([P_Rating_LY]), BLANK(),
+    a >= 1, 1,
+    a)
+
+4. P_Positive_reviews.
+Tính số lượng đơn được đánh giá là tích cực.
+
+P_Positive_reviews = calculate(countrows(fact_review), fact_review[is_positive]=True())
+
+5. P_highlight_Positive.
+Dùng để highlight cột có số lượng đơn hàng đánh giá tốt.
+
+P_Highlight_Positive = 
+VAR MaxValue =
+    CALCULATE(
+        MAXX(
+            ALLSELECTED(dim_date[month]),
+            [P_Positive_Reviews]) )
+RETURN
+IF(
+    [P_Positive_Reviews] = MaxValue,"#0B3C5D", "#CFCFCF")
+
+6. P_Rank_Rating_Products.
+Dùng để highlight 3 cột sản phẩm có số điểm đánh giá trung bình cao nhất.
+
+P_Rank_Rating_Products = var a=rankx(ALLSELECTED(dim_date[month]), [P_Avg_Rating],,desc, Dense) return if (a <=3, "#0B3C5D", "#CFCFCF")
+
+7. P_Total_Quantity.
+Đếm số dòng trong bảng fact_sale.
+
+P_Total Quantity = 
+CALCULATE(
+    COUNTROWS(fact_sale))
+
+
+8. Rating Segment.
+Tạo ra cột để phân loại sản phẩm theo thang điểm đánh giá review.
+
+Rating Segment = 
+VAR rating = [P_Avg_Rating]
+RETURN
+SWITCH(
+    TRUE(),
+    rating >= 4, "High Rating",
+    rating >= 3, "Medium Rating",
+    "Low Rating"
+)
